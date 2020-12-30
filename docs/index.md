@@ -1,5 +1,6 @@
-[![pypi](https://img.shields.io/pypi/v/pybadges.svg)](https://pypi.org/project/diem/)
-![Apache V2 License](https://img.shields.io/badge/license-Apache%20V2-blue.svg)
+[![pypi](https://img.shields.io/pypi/v/diem)](https://pypi.org/project/diem/)
+![Apache V2 License](https://img.shields.io/pypi/l/diem)
+![Python versoins](https://img.shields.io/pypi/pyversions/diem)
 
 [Documentation](diem/index.html)
 
