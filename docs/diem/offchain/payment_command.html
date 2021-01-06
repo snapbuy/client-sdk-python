@@ -31,8 +31,6 @@
 
 import typing, dataclasses, uuid
 
-from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
-from cryptography.exceptions import InvalidSignature
 from .types import (
     CommandRequestObject,
     ErrorCode,
@@ -149,6 +147,7 @@ class PaymentCommand(Command):
         abort_code: typing.Optional[str] = None,
         abort_message: typing.Optional[str] = None,
         inbound: bool = False,
+        metadata: typing.Optional[typing.List[str]] = None,
     ) -&gt; Command:
         changes: typing.Dict[str, typing.Any] = {
             self.my_actor().value: replace_payment_actor(
@@ -158,6 +157,7 @@ class PaymentCommand(Command):
                 additional_kyc_data=additional_kyc_data,
                 abort_code=abort_code,
                 abort_message=abort_message,
+                metadata=metadata,
             ),
         }
         if recipient_signature:
@@ -258,10 +258,10 @@ class PaymentCommand(Command):
 <dl>
 <dt id="diem.offchain.payment_command.PaymentCommand"><code class="flex name class">
 <span>class <span class="ident">PaymentCommand</span></span>
-<span>(</span><span>my_actor_address: str, payment: <a title="diem.offchain.types.data_types.PaymentObject" href="types/data_types.html#diem.offchain.types.data_types.PaymentObject">PaymentObject</a>, inbound: bool, cid: str = &lt;factory&gt;)</span>
+<span>(</span><span>my_actor_address: str, payment: <a title="diem.offchain.types.payment_types.PaymentObject" href="types/payment_types.html#diem.offchain.types.payment_types.PaymentObject">PaymentObject</a>, inbound: bool, cid: str = &lt;factory&gt;)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>PaymentCommand(my_actor_address: str, payment: diem.offchain.types.data_types.PaymentObject, inbound: bool, cid: str = <factory>)</p></div>
+<div class="desc"><p>PaymentCommand(my_actor_address: str, payment: diem.offchain.types.payment_types.PaymentObject, inbound: bool, cid: str = <factory>)</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -361,6 +361,7 @@ class PaymentCommand(Command):
         abort_code: typing.Optional[str] = None,
         abort_message: typing.Optional[str] = None,
         inbound: bool = False,
+        metadata: typing.Optional[typing.List[str]] = None,
     ) -&gt; Command:
         changes: typing.Dict[str, typing.Any] = {
             self.my_actor().value: replace_payment_actor(
@@ -370,6 +371,7 @@ class PaymentCommand(Command):
                 additional_kyc_data=additional_kyc_data,
                 abort_code=abort_code,
                 abort_message=abort_message,
+                metadata=metadata,
             ),
         }
         if recipient_signature:
@@ -477,7 +479,7 @@ class PaymentCommand(Command):
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="diem.offchain.payment_command.PaymentCommand.payment"><code class="name">var <span class="ident">payment</span> : <a title="diem.offchain.types.data_types.PaymentObject" href="types/data_types.html#diem.offchain.types.data_types.PaymentObject">PaymentObject</a></code></dt>
+<dt id="diem.offchain.payment_command.PaymentCommand.payment"><code class="name">var <span class="ident">payment</span> : <a title="diem.offchain.types.payment_types.PaymentObject" href="types/payment_types.html#diem.offchain.types.payment_types.PaymentObject">PaymentObject</a></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -485,7 +487,7 @@ class PaymentCommand(Command):
 <h3>Static methods</h3>
 <dl>
 <dt id="diem.offchain.payment_command.PaymentCommand.init"><code class="name flex">
-<span>def <span class="ident">init</span></span>(<span>sender_account_id: str, sender_kyc_data: <a title="diem.offchain.types.data_types.KycDataObject" href="types/data_types.html#diem.offchain.types.data_types.KycDataObject">KycDataObject</a>, receiver_account_id: str, amount: int, currency: str, original_payment_reference_id: Optional[str] = None, description: Optional[str] = None, inbound: bool = False) ‑> <a title="diem.offchain.payment_command.PaymentCommand" href="#diem.offchain.payment_command.PaymentCommand">PaymentCommand</a></span>
+<span>def <span class="ident">init</span></span>(<span>sender_account_id: str, sender_kyc_data: <a title="diem.offchain.types.payment_types.KycDataObject" href="types/payment_types.html#diem.offchain.types.payment_types.KycDataObject">KycDataObject</a>, receiver_account_id: str, amount: int, currency: str, original_payment_reference_id: Optional[str] = None, description: Optional[str] = None, inbound: bool = False) ‑> <a title="diem.offchain.payment_command.PaymentCommand" href="#diem.offchain.payment_command.PaymentCommand">PaymentCommand</a></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -682,7 +684,7 @@ def init(
 </details>
 </dd>
 <dt id="diem.offchain.payment_command.PaymentCommand.my_actor_obj"><code class="name flex">
-<span>def <span class="ident">my_actor_obj</span></span>(<span>self) ‑> <a title="diem.offchain.types.data_types.PaymentActorObject" href="types/data_types.html#diem.offchain.types.data_types.PaymentActorObject">PaymentActorObject</a></span>
+<span>def <span class="ident">my_actor_obj</span></span>(<span>self) ‑> <a title="diem.offchain.types.payment_types.PaymentActorObject" href="types/payment_types.html#diem.offchain.types.payment_types.PaymentActorObject">PaymentActorObject</a></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -695,7 +697,7 @@ def init(
 </details>
 </dd>
 <dt id="diem.offchain.payment_command.PaymentCommand.new_request"><code class="name flex">
-<span>def <span class="ident">new_request</span></span>(<span>self) ‑> <a title="diem.offchain.types.data_types.CommandRequestObject" href="types/data_types.html#diem.offchain.types.data_types.CommandRequestObject">CommandRequestObject</a></span>
+<span>def <span class="ident">new_request</span></span>(<span>self) ‑> <a title="diem.offchain.types.command_types.CommandRequestObject" href="types/command_types.html#diem.offchain.types.command_types.CommandRequestObject">CommandRequestObject</a></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -721,7 +723,7 @@ def init(
 </details>
 </dd>
 <dt id="diem.offchain.payment_command.PaymentCommand.opponent_actor_obj"><code class="name flex">
-<span>def <span class="ident">opponent_actor_obj</span></span>(<span>self) ‑> <a title="diem.offchain.types.data_types.PaymentActorObject" href="types/data_types.html#diem.offchain.types.data_types.PaymentActorObject">PaymentActorObject</a></span>
+<span>def <span class="ident">opponent_actor_obj</span></span>(<span>self) ‑> <a title="diem.offchain.types.payment_types.PaymentActorObject" href="types/payment_types.html#diem.offchain.types.payment_types.PaymentActorObject">PaymentActorObject</a></span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -799,7 +801,7 @@ def init(
 </details>
 </dd>
 <dt id="diem.offchain.payment_command.PaymentCommand.state"><code class="name flex">
-<span>def <span class="ident">state</span></span>(<span>self) ‑> <a title="diem.offchain.state.State" href="state.html#diem.offchain.state.State">State</a>[<a title="diem.offchain.types.data_types.PaymentObject" href="types/data_types.html#diem.offchain.types.data_types.PaymentObject">PaymentObject</a>]</span>
+<span>def <span class="ident">state</span></span>(<span>self) ‑> <a title="diem.offchain.state.State" href="state.html#diem.offchain.state.State">State</a>[<a title="diem.offchain.types.payment_types.PaymentObject" href="types/payment_types.html#diem.offchain.types.payment_types.PaymentObject">PaymentObject</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>

@@ -224,7 +224,7 @@ def summary(
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="diem.offchain.payment_state.follow_up_action"><code class="name flex">
-<span>def <span class="ident">follow_up_action</span></span>(<span>actor: <a title="diem.offchain.payment_state.Actor" href="#diem.offchain.payment_state.Actor">Actor</a>, state: <a title="diem.offchain.state.State" href="state.html#diem.offchain.state.State">State</a>[<a title="diem.offchain.types.data_types.PaymentObject" href="types/data_types.html#diem.offchain.types.data_types.PaymentObject">PaymentObject</a>]) ‑> Optional[<a title="diem.offchain.action.Action" href="action.html#diem.offchain.action.Action">Action</a>]</span>
+<span>def <span class="ident">follow_up_action</span></span>(<span>actor: <a title="diem.offchain.payment_state.Actor" href="#diem.offchain.payment_state.Actor">Actor</a>, state: <a title="diem.offchain.state.State" href="state.html#diem.offchain.state.State">State</a>[<a title="diem.offchain.types.payment_types.PaymentObject" href="types/payment_types.html#diem.offchain.types.payment_types.PaymentObject">PaymentObject</a>]) ‑> Optional[<a title="diem.offchain.action.Action" href="action.html#diem.offchain.action.Action">Action</a>]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -241,7 +241,7 @@ def summary(
 </details>
 </dd>
 <dt id="diem.offchain.payment_state.status"><code class="name flex">
-<span>def <span class="ident">status</span></span>(<span>actor: str, s: str) ‑> <a title="diem.offchain.state.Value" href="state.html#diem.offchain.state.Value">Value</a>[<a title="diem.offchain.types.data_types.PaymentObject" href="types/data_types.html#diem.offchain.types.data_types.PaymentObject">PaymentObject</a>, str]</span>
+<span>def <span class="ident">status</span></span>(<span>actor: str, s: str) ‑> <a title="diem.offchain.state.Value" href="state.html#diem.offchain.state.Value">Value</a>[<a title="diem.offchain.types.payment_types.PaymentObject" href="types/payment_types.html#diem.offchain.types.payment_types.PaymentObject">PaymentObject</a>, str]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -254,7 +254,7 @@ def summary(
 </details>
 </dd>
 <dt id="diem.offchain.payment_state.summary"><code class="name flex">
-<span>def <span class="ident">summary</span></span>(<span>obj: Union[<a title="diem.offchain.types.data_types.PaymentObject" href="types/data_types.html#diem.offchain.types.data_types.PaymentObject">PaymentObject</a>, <a title="diem.offchain.types.data_types.PaymentActorObject" href="types/data_types.html#diem.offchain.types.data_types.PaymentActorObject">PaymentActorObject</a>, <a title="diem.offchain.types.data_types.StatusObject" href="types/data_types.html#diem.offchain.types.data_types.StatusObject">StatusObject</a>, <a title="diem.offchain.types.data_types.KycDataObject" href="types/data_types.html#diem.offchain.types.data_types.KycDataObject">KycDataObject</a>, str, NoneType]) ‑> str</span>
+<span>def <span class="ident">summary</span></span>(<span>obj: Union[<a title="diem.offchain.types.payment_types.PaymentObject" href="types/payment_types.html#diem.offchain.types.payment_types.PaymentObject">PaymentObject</a>, <a title="diem.offchain.types.payment_types.PaymentActorObject" href="types/payment_types.html#diem.offchain.types.payment_types.PaymentActorObject">PaymentActorObject</a>, <a title="diem.offchain.types.payment_types.StatusObject" href="types/payment_types.html#diem.offchain.types.payment_types.StatusObject">StatusObject</a>, <a title="diem.offchain.types.payment_types.KycDataObject" href="types/payment_types.html#diem.offchain.types.payment_types.KycDataObject">KycDataObject</a>, str, NoneType]) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -297,7 +297,7 @@ def summary(
 </details>
 </dd>
 <dt id="diem.offchain.payment_state.trigger_actor"><code class="name flex">
-<span>def <span class="ident">trigger_actor</span></span>(<span>state: <a title="diem.offchain.state.State" href="state.html#diem.offchain.state.State">State</a>[<a title="diem.offchain.types.data_types.PaymentObject" href="types/data_types.html#diem.offchain.types.data_types.PaymentObject">PaymentObject</a>]) ‑> <a title="diem.offchain.payment_state.Actor" href="#diem.offchain.payment_state.Actor">Actor</a></span>
+<span>def <span class="ident">trigger_actor</span></span>(<span>state: <a title="diem.offchain.state.State" href="state.html#diem.offchain.state.State">State</a>[<a title="diem.offchain.types.payment_types.PaymentObject" href="types/payment_types.html#diem.offchain.types.payment_types.PaymentObject">PaymentObject</a>]) ‑> <a title="diem.offchain.payment_state.Actor" href="#diem.offchain.payment_state.Actor">Actor</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>The actor triggers the action / event to produce the PaymentObject</p></div>
