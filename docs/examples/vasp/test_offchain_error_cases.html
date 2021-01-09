@@ -1,0 +1,1713 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>examples.vasp.test_offchain_error_cases API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>examples.vasp.test_offchain_error_cases</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python"># Copyright (c) The Diem Core Contributors
+# SPDX-License-Identifier: Apache-2.0
+
+from diem.offchain import (
+    Status,
+    Action,
+    jws,
+    http_header,
+    CommandResponseObject,
+    CommandResponseError,
+    PaymentActionObject,
+)
+from diem import LocalAccount, identifier, testnet
+from .wallet import ActionResult
+import dataclasses, requests, json, copy, pytest, uuid
+
+
+AMOUNT = 1_000_000_000
+
+
+def test_send_command_failed_by_invalid_jws_signature_and_retry_by_bg_job(monkeypatch, sender_app, receiver_app):
+    intent_id = receiver_app.gen_intent_id(&#34;bar&#34;, AMOUNT)
+
+    with monkeypatch.context() as m:
+        m.setattr(sender_app, &#34;compliance_key&#34;, LocalAccount.generate().compliance_key)
+        sender_app.pay(&#34;foo&#34;, intent_id)
+
+        assert len(sender_app.saved_commands) == 1
+        assert len(receiver_app.saved_commands) == 0
+
+        with pytest.raises(CommandResponseError) as err:
+            sender_app.run_once_background_job()
+
+        assert_response_command_error(err.value.resp, &#34;invalid_jws_signature&#34;)
+
+        assert len(sender_app.saved_commands) == 1
+        assert len(receiver_app.saved_commands) == 0
+
+    assert sender_app.run_once_background_job() == ActionResult.SEND_REQUEST_SUCCESS
+
+    assert len(sender_app.saved_commands) == 1
+    assert len(receiver_app.saved_commands) == 1
+
+    # receiver_app continues the flow after error is recovered
+    assert receiver_app.run_once_background_job() == (
+        Action.EVALUATE_KYC_DATA,
+        ActionResult.PASS,
+    )
+
+
+def test_send_command_failed_by_server_internal_error_and_retry_by_bg_job(monkeypatch, sender_app, receiver_app):
+    intent_id = receiver_app.gen_intent_id(&#34;bar&#34;, AMOUNT)
+
+    with monkeypatch.context() as m:
+        # receiver side save request failed, which causes 500 error to sender client
+        m.setattr(
+            receiver_app,
+            &#34;save_command&#34;,
+            raise_error(Exception(&#34;simulate receiver app internal error&#34;)),
+        )
+        reference_id = sender_app.pay(&#34;foo&#34;, intent_id)
+        with pytest.raises(Exception):
+            sender_app.run_once_background_job()
+
+        assert len(sender_app.saved_commands) == 1
+        assert len(receiver_app.saved_commands) == 0
+
+    assert sender_app.run_once_background_job() == ActionResult.SEND_REQUEST_SUCCESS
+
+    assert len(sender_app.saved_commands) == 1
+    assert len(receiver_app.saved_commands) == 1
+
+    # receiver continues the flow after error is recovered
+    assert receiver_app.run_once_background_job() == (
+        Action.EVALUATE_KYC_DATA,
+        ActionResult.PASS,
+    )
+    assert receiver_app.run_once_background_job() == ActionResult.SEND_REQUEST_SUCCESS
+
+    with monkeypatch.context() as m:
+        # receiver side save request failed, which causes 500 error to sender client
+        m.setattr(
+            receiver_app,
+            &#34;save_command&#34;,
+            raise_error(Exception(&#34;simulate server internal error&#34;)),
+        )
+
+        # action success but send request should fail
+        assert sender_app.run_once_background_job() == (
+            Action.EVALUATE_KYC_DATA,
+            ActionResult.PASS,
+        )
+        with pytest.raises(Exception):
+            sender_app.run_once_background_job()
+
+        assert sender_status(sender_app, reference_id) == Status.ready_for_settlement
+        assert sender_status(receiver_app, reference_id) == Status.needs_kyc_data
+
+        # retry failed again
+        with pytest.raises(Exception):
+            sender_app.run_once_background_job()
+
+        assert sender_status(sender_app, reference_id) == Status.ready_for_settlement
+        assert sender_status(receiver_app, reference_id) == Status.needs_kyc_data
+
+    assert sender_app.run_once_background_job() == ActionResult.SEND_REQUEST_SUCCESS
+    assert sender_status(sender_app, reference_id) == Status.ready_for_settlement
+    assert sender_status(receiver_app, reference_id) == Status.ready_for_settlement
+
+
+def test_invalid_command_request_json(sender_app, receiver_app):
+    resp = send_request(&#34;invalid_request_json&#34;, sender_app, receiver_app, &#34;failure&#34;)
+
+    assert resp.cid is None
+    assert_response_command_error(resp, &#34;invalid_object&#34;)
+
+
+def test_invalid_json(sender_app, receiver_app):
+    resp = send_request_json(&#34;invalid_json&#34;, sender_app, receiver_app, &#34;failure&#34;)
+
+    assert resp.cid is None
+    assert_response_command_error(resp, &#34;invalid_json&#34;)
+
+
+def test_missing_required_fields(sender_app, receiver_app):
+    request = minimum_required_fields_request_sample(sender_app, receiver_app)
+    assert send_request(request, sender_app, receiver_app, &#34;success&#34;)
+
+    for field in find_all_fields(request):
+        # ignore national_id which is optional, the id_value in national_id is required
+        if field in [&#34;command.payment.sender.kyc_data.national_id&#34;]:
+            continue
+        new_req = copy.deepcopy(request)
+        set_field(new_req, field, None)
+        resp = send_request(new_req, sender_app, receiver_app, &#34;failure&#34;)
+        assert_response_command_error(resp, &#34;missing_field&#34;, field)
+
+
+def test_unknown_fields(sender_app, receiver_app):
+    request = minimum_required_fields_request_sample(sender_app, receiver_app)
+
+    for field in find_all_fields(request):
+        new_req = copy.deepcopy(request)
+        unknown_field = field + &#34;-unknown&#34;
+        set_field(new_req, unknown_field, &#34;any&#34;)
+        resp = send_request(new_req, sender_app, receiver_app, &#34;failure&#34;)
+        assert_response_command_error(resp, &#34;unknown_field&#34;, unknown_field)
+
+
+def test_invalid_field_value(sender_app, receiver_app):
+    request = minimum_required_fields_request_sample(sender_app, receiver_app)
+
+    fields = [
+        &#34;_ObjectType&#34;,
+        &#34;command_type&#34;,
+        &#34;command._ObjectType&#34;,
+        &#34;command.payment.action.action&#34;,
+        &#34;command.payment.receiver.status.status&#34;,
+        &#34;command.payment.receiver.address&#34;,
+        &#34;command.payment.sender.address&#34;,
+        &#34;command.payment.sender.status.status&#34;,
+        &#34;command.payment.sender.kyc_data.type&#34;,
+        &#34;command.payment.sender.kyc_data.payload_version&#34;,
+    ]
+    for field in fields:
+        new_req = copy.deepcopy(request)
+        set_field(new_req, field, &#34;invalid-value&#34;)
+        resp = send_request(new_req, sender_app, receiver_app, &#34;failure&#34;)
+        assert_response_command_error(resp, &#34;invalid_field_value&#34;, field)
+
+
+def test_invalid_field_value_type(sender_app, receiver_app):
+    request = minimum_required_fields_request_sample(sender_app, receiver_app)
+
+    fields = [
+        &#34;command.payment.sender.status&#34;,  # status is object, status.status is status enum string
+        &#34;command.payment.sender.metadata&#34;,
+    ]
+    for field in fields:
+        new_req = copy.deepcopy(request)
+        set_field(new_req, field, &#34;invalid-value-type&#34;)
+        resp = send_request(new_req, sender_app, receiver_app, &#34;failure&#34;)
+        assert_response_command_error(resp, &#34;invalid_field_value&#34;, field)
+
+
+def test_invalid_actor_metadata_item_type(sender_app, receiver_app):
+    request = minimum_required_fields_request_sample(sender_app, receiver_app)
+
+    field = &#34;command.payment.sender.metadata&#34;
+    set_field(request, field, [&#34;1&#34;, 2])
+    resp = send_request(request, sender_app, receiver_app, &#34;failure&#34;)
+    assert_response_command_error(resp, &#34;invalid_field_value&#34;, field)
+
+
+def test_written_once_payment_actor_kyc_data(sender_app, receiver_app):
+    assert_invalid_overwrite_error(
+        sender_app,
+        receiver_app,
+        &#34;payment.sender.kyc_data&#34;,
+        lambda cmd: replace_command_sender(cmd, kyc_data=sender_app.users[&#34;user-x&#34;].kyc_data()),
+    )
+
+
+def test_written_once_payment_actor_additional_kyc_data(sender_app, receiver_app):
+    assert_invalid_overwrite_error(
+        sender_app,
+        receiver_app,
+        &#34;payment.sender.additional_kyc_data&#34;,
+        lambda cmd: replace_command_sender(cmd, additional_kyc_data=&#34;random stuff&#34;),
+    )
+
+
+def test_written_once_payment_actor_address(sender_app, receiver_app):
+    new_sender_address = sender_app.gen_user_account_id(&#34;user-x&#34;)
+
+    def update_cmd(cmd):
+        cmd = replace_command_sender(cmd, address=new_sender_address)
+        return dataclasses.replace(cmd, my_actor_address=new_sender_address)
+
+    assert_invalid_overwrite_error(sender_app, receiver_app, &#34;payment.sender.address&#34;, update_cmd)
+
+
+def test_written_once_payment_action(sender_app, receiver_app):
+    assert_invalid_overwrite_error(
+        sender_app,
+        receiver_app,
+        &#34;payment.action&#34;,
+        lambda cmd: replace_command_payment(cmd, action=PaymentActionObject(amount=AMOUNT, currency=&#34;XDX&#34;)),
+    )
+
+
+def test_written_once_payment_recipient_signature(sender_app, receiver_app):
+    assert_invalid_overwrite_error(
+        sender_app,
+        receiver_app,
+        &#34;payment.recipient_signature&#34;,
+        lambda cmd: replace_command_payment(cmd, recipient_signature=&#34;sig&#34;),
+    )
+
+
+def test_written_once_payment_description(sender_app, receiver_app):
+    assert_invalid_overwrite_error(
+        sender_app,
+        receiver_app,
+        &#34;payment.description&#34;,
+        lambda cmd: replace_command_payment(cmd, description=&#34;want to change desc&#34;),
+    )
+
+
+def test_written_once_payment_original_payment_reference_id(sender_app, receiver_app):
+    assert_invalid_overwrite_error(
+        sender_app,
+        receiver_app,
+        &#34;payment.original_payment_reference_id&#34;,
+        lambda cmd: replace_command_payment(cmd, original_payment_reference_id=&#34;4185027f-0574-6f55-2668-3a38fdb5de98&#34;),
+        original_payment_reference_id=&#34;6185027f-0574-6f55-2668-3a38fdb5de98&#34;,
+    )
+
+
+def test_written_once_payment_original_payment_reference_id_initial_only(sender_app, receiver_app):
+    assert_invalid_overwrite_error(
+        sender_app,
+        receiver_app,
+        &#34;payment.original_payment_reference_id&#34;,
+        lambda cmd: replace_command_payment(cmd, original_payment_reference_id=&#34;4185027f-0574-6f55-2668-3a38fdb5de98&#34;),
+    )
+
+
+def test_update_opponent_actor_field_error(sender_app, receiver_app):
+    assert_invalid_overwrite_error(
+        sender_app,
+        receiver_app,
+        &#34;payment.receiver&#34;,
+        lambda cmd: replace_actor(cmd, &#34;receiver&#34;, cmd.payment.receiver, additional_kyc_data=&#34;random stuff&#34;),
+    )
+
+
+def test_resource_is_locked_error(sender_app, receiver_app):
+    intent_id = receiver_app.gen_intent_id(&#34;bar&#34;, AMOUNT)
+    ref_id = sender_app.pay(&#34;foo&#34;, intent_id)
+    assert sender_app.run_once_background_job() == ActionResult.SEND_REQUEST_SUCCESS
+
+    sender_app.lock(ref_id).acquire()
+    assert receiver_app.run_once_background_job() == (
+        Action.EVALUATE_KYC_DATA,
+        ActionResult.PASS,
+    )
+    with pytest.raises(CommandResponseError) as err:
+        receiver_app.run_once_background_job()
+
+    assert_response_command_error(err.value.resp, &#34;conflict&#34;)
+
+
+def test_travel_rule_limit_validation(sender_app, receiver_app):
+    request = minimum_required_fields_request_sample(sender_app, receiver_app, 10)
+
+    resp = send_request(request, sender_app, receiver_app, &#34;failure&#34;)
+    assert_response_command_error(resp, &#34;no_kyc_needed&#34;, &#34;command.payment.action.amount&#34;)
+
+
+def test_invalid_currency_code(sender_app, receiver_app):
+    request = minimum_required_fields_request_sample(sender_app, receiver_app, currency=&#34;XXX&#34;)
+
+    resp = send_request(request, sender_app, receiver_app, &#34;failure&#34;)
+    assert_response_command_error(resp, &#34;invalid_field_value&#34;, &#34;command.payment.action.currency&#34;)
+
+
+def test_cid_uuid(sender_app, receiver_app):
+    request = minimum_required_fields_request_sample(sender_app, receiver_app)
+    request[&#34;cid&#34;] = &#34;invalid uuid&#34;
+    resp = send_request(request, sender_app, receiver_app, &#34;failure&#34;)
+    assert_response_command_error(resp, &#34;invalid_field_value&#34;, &#34;cid&#34;)
+
+
+def test_reference_id_uuid(sender_app, receiver_app):
+    request = minimum_required_fields_request_sample(sender_app, receiver_app)
+    request[&#34;command&#34;][&#34;payment&#34;][&#34;reference_id&#34;] = &#34;invalid uuid&#34;
+    resp = send_request(request, sender_app, receiver_app, &#34;failure&#34;)
+    assert_response_command_error(resp, &#34;invalid_field_value&#34;, &#34;command.payment.reference_id&#34;)
+
+
+def test_unknown_actor_address_could_not_find_request_receiver_account_id(sender_app, receiver_app):
+    request = minimum_required_fields_request_sample(sender_app, receiver_app)
+    request[&#34;command&#34;][&#34;payment&#34;][&#34;receiver&#34;][&#34;address&#34;] = sender_app.offchain_client.my_compliance_key_account_id
+    resp = send_request(request, sender_app, receiver_app, &#34;failure&#34;)
+    assert_response_command_error(resp, &#34;unknown_actor_address&#34;)
+
+
+def test_x_request_sender_address_must_one_of_actor_addresses(sender_app, receiver_app):
+    request = minimum_required_fields_request_sample(sender_app, receiver_app)
+    resp = send_request(
+        request,
+        sender_app,
+        receiver_app,
+        &#34;failure&#34;,
+        sender_address=sender_app.offchain_client.my_compliance_key_account_id,
+    )
+    assert_response_command_error(resp, &#34;invalid_x_request_sender_address&#34;)
+
+
+def test_http_header_x_request_sender_address_missing(sender_app, receiver_app):
+    request = minimum_required_fields_request_sample(sender_app, receiver_app)
+    resp = send_request_json_with_headers(
+        json.dumps(request), sender_app, receiver_app, &#34;failure&#34;, {http_header.X_REQUEST_ID: str(uuid.uuid4())}
+    )
+    assert_response_protocol_error(resp, &#34;missing_http_header&#34;)
+
+
+def test_could_not_find_onchain_account_by_x_request_sender_address(sender_app, receiver_app):
+    account = LocalAccount.generate()
+    account_id = identifier.encode_account(account.account_address, None, sender_app.hrp)
+    request = minimum_required_fields_request_sample(sender_app, receiver_app)
+    request[&#34;command&#34;][&#34;payment&#34;][&#34;sender&#34;][&#34;address&#34;] = account_id
+    resp = send_request(request, sender_app, receiver_app, &#34;failure&#34;, sender_address=account_id)
+    assert_response_protocol_error(resp, &#34;invalid_x_request_sender_address&#34;)
+
+
+def test_could_not_find_compliance_key_of_x_request_sender_address(sender_app, receiver_app):
+    account = testnet.gen_account(testnet.create_client())
+    account_id = identifier.encode_account(account.account_address, None, sender_app.hrp)
+    request = minimum_required_fields_request_sample(sender_app, receiver_app)
+    request[&#34;command&#34;][&#34;payment&#34;][&#34;sender&#34;][&#34;address&#34;] = account_id
+    resp = send_request(request, sender_app, receiver_app, &#34;failure&#34;, sender_address=account_id)
+    assert_response_protocol_error(resp, &#34;invalid_x_request_sender_address&#34;)
+
+
+def test_invalid_recipient_signature(sender_app, receiver_app):
+    intent_id = receiver_app.gen_intent_id(&#34;bar&#34;, AMOUNT)
+    ref_id = sender_app.pay(&#34;foo&#34;, intent_id)
+    assert sender_app.run_once_background_job() == ActionResult.SEND_REQUEST_SUCCESS
+
+    assert receiver_app.run_once_background_job() == (
+        Action.EVALUATE_KYC_DATA,
+        ActionResult.PASS,
+    )
+    cmd = receiver_app.saved_commands.get(ref_id)
+    invalid_sig_cmd = replace_command_payment(cmd, recipient_signature=b&#34;invalid-sig&#34;.hex())
+    with pytest.raises(CommandResponseError) as err:
+        assert receiver_app._send_request(invalid_sig_cmd)
+
+    assert_response_command_error(err.value.resp, &#34;invalid_recipient_signature&#34;, &#34;command.payment.recipient_signature&#34;)
+
+
+def test_receiver_actor_is_ready_for_settlement_but_recipient_signature_is_none(sender_app, receiver_app):
+    intent_id = receiver_app.gen_intent_id(&#34;bar&#34;, AMOUNT)
+    ref_id = sender_app.pay(&#34;foo&#34;, intent_id)
+    assert sender_app.run_once_background_job() == ActionResult.SEND_REQUEST_SUCCESS
+
+    assert receiver_app.run_once_background_job() == (
+        Action.EVALUATE_KYC_DATA,
+        ActionResult.PASS,
+    )
+    cmd = receiver_app.saved_commands.get(ref_id)
+    missing_sig_cmd = replace_command_payment(cmd, recipient_signature=None)
+    with pytest.raises(CommandResponseError) as err:
+        assert receiver_app._send_request(missing_sig_cmd)
+
+    assert_response_command_error(err.value.resp, &#34;missing_field&#34;, &#34;command.payment.recipient_signature&#34;)
+
+
+def test_invalid_recipient_signature_hex(sender_app, receiver_app):
+    intent_id = receiver_app.gen_intent_id(&#34;bar&#34;, AMOUNT)
+    ref_id = sender_app.pay(&#34;foo&#34;, intent_id)
+    assert sender_app.run_once_background_job() == ActionResult.SEND_REQUEST_SUCCESS
+
+    assert receiver_app.run_once_background_job() == (
+        Action.EVALUATE_KYC_DATA,
+        ActionResult.PASS,
+    )
+    cmd = receiver_app.saved_commands.get(ref_id)
+    invalid_sig_cmd = replace_command_payment(cmd, recipient_signature=&#34;invalid-sig-hex&#34;)
+    with pytest.raises(CommandResponseError) as err:
+        assert receiver_app._send_request(invalid_sig_cmd)
+
+    assert_response_command_error(err.value.resp, &#34;invalid_recipient_signature&#34;, &#34;command.payment.recipient_signature&#34;)
+
+
+def replace_actor(cmd, name, actor, **changes):
+    new_actor = dataclasses.replace(actor, **changes)
+    return replace_command_payment(cmd, **{name: new_actor})
+
+
+def replace_command_sender(cmd, **changes):
+    return replace_actor(cmd, &#34;sender&#34;, cmd.payment.sender, **changes)
+
+
+def replace_command_payment(cmd, **changes):
+    new_payment = dataclasses.replace(cmd.payment, **changes)
+    return dataclasses.replace(cmd, payment=new_payment)
+
+
+def assert_invalid_overwrite_error(sender_app, receiver_app, field, update_cmd, original_payment_reference_id=None):
+    # setup soft match for sender provide additional_kyc_data
+    receiver_app.evaluate_kyc_data_result = {&#34;foo&#34;: ActionResult.SOFT_MATCH}
+    receiver_app.manual_review_result = {&#34;foo&#34;: ActionResult.PASS}
+
+    intent_id = receiver_app.gen_intent_id(&#34;bar&#34;, AMOUNT)
+    ref_id = sender_app.pay(
+        &#34;foo&#34;, intent_id, original_payment_reference_id=original_payment_reference_id, desc=&#34;this is a good deal&#34;
+    )
+    assert sender_app.run_once_background_job() == ActionResult.SEND_REQUEST_SUCCESS
+
+    assert receiver_app.run_once_background_job() == (
+        Action.EVALUATE_KYC_DATA,
+        ActionResult.SOFT_MATCH,
+    )
+    assert receiver_app.run_once_background_job() == ActionResult.SEND_REQUEST_SUCCESS
+    assert sender_app.run_once_background_job() == (
+        Action.CLEAR_SOFT_MATCH,
+        ActionResult.SENT_ADDITIONAL_KYC_DATA,
+    )
+    assert sender_app.run_once_background_job() == ActionResult.SEND_REQUEST_SUCCESS
+    assert receiver_app.run_once_background_job() == (
+        Action.REVIEW_KYC_DATA,
+        ActionResult.PASS,
+    )
+    assert receiver_app.run_once_background_job() == ActionResult.SEND_REQUEST_SUCCESS
+
+    # sender provided kyc_data and additional_kyc_data
+    # receiver provided signature and kyc_data
+
+    assert len(sender_app.saved_commands) == 1
+
+    cmd = sender_app.saved_commands.get(ref_id)
+    sender_app.saved_commands[ref_id] = update_cmd(cmd)
+
+    assert sender_app.run_once_background_job() == (
+        Action.EVALUATE_KYC_DATA,
+        ActionResult.PASS,
+    )
+    with pytest.raises(CommandResponseError) as err:
+        sender_app.run_once_background_job()
+
+    assert_response_command_error(err.value.resp, &#34;invalid_overwrite&#34;, field)
+
+
+def assert_response_command_error(resp, code, field=None):
+    assert_response_error(resp, code, &#34;command_error&#34;, field)
+
+
+def assert_response_protocol_error(resp, code, field=None):
+    assert_response_error(resp, code, &#34;protocol_error&#34;, field)
+
+
+def assert_response_error(resp, code, err_type, field=None):
+    assert resp.error, resp
+    assert resp.error.type == err_type, resp
+    assert resp.error.code == code, resp
+    assert resp.error.field == field, resp
+
+
+def set_field(dic, field, value):
+    path = field.split(&#34;.&#34;)
+    for f in path[0 : len(path) - 1]:
+        if f not in dic:
+            dic[f] = {}
+        dic = dic[f]
+
+    dic[path[len(path) - 1]] = value
+
+
+def find_all_fields(dic):
+    ret = []
+    for key in dic:
+        ret.append(key)
+        if isinstance(dic[key], dict):
+            sub_fields = find_all_fields(dic[key])
+            for sf in sub_fields:
+                ret.append(&#34;.&#34;.join([key, sf]))
+    return ret
+
+
+def send_request(request, sender_app, receiver_app, expected_resp_status, sender_address=None) -&gt; CommandResponseObject:
+    return send_request_json(json.dumps(request), sender_app, receiver_app, expected_resp_status, sender_address)
+
+
+def send_request_json(
+    request_json, sender_app, receiver_app, expected_resp_status, sender_address=None
+) -&gt; CommandResponseObject:
+    if sender_address is None:
+        subaddresses = sender_app.users[&#34;foo&#34;].subaddresses
+        subaddress = subaddresses[len(subaddresses) - 1] if len(subaddresses) &gt; 0 else None
+        account_address = sender_app._available_child_vasp().account_address
+        sender_address = identifier.encode_account(account_address, subaddress, sender_app.hrp)
+    return send_request_json_with_headers(
+        request_json,
+        sender_app,
+        receiver_app,
+        expected_resp_status,
+        {
+            http_header.X_REQUEST_ID: str(uuid.uuid4()),
+            http_header.X_REQUEST_SENDER_ADDRESS: sender_address,
+        },
+    )
+
+
+def send_request_json_with_headers(
+    request_json, sender_app, receiver_app, expected_resp_status, headers
+) -&gt; CommandResponseObject:
+    session = requests.Session()
+    resp = session.post(
+        f&#34;http://localhost:{receiver_app.offchain_service_port}/v2/command&#34;,
+        data=jws.serialize_string(request_json, sender_app.compliance_key.sign),
+        headers=headers,
+    )
+
+    cmd_resp_obj = jws.deserialize(
+        resp.content,
+        CommandResponseObject,
+        receiver_app.compliance_key.public_key().verify,
+    )
+    assert cmd_resp_obj.status == expected_resp_status
+    if expected_resp_status == &#34;success&#34;:
+        assert resp.status_code == 200
+    else:
+        assert resp.status_code == 400
+
+    return cmd_resp_obj
+
+
+def sender_status(wallet, ref_id):
+    command = wallet.saved_commands[ref_id]
+    return command.payment.sender.status.status
+
+
+def raise_error(e: Exception):
+    def fn(*args, **wargs):
+        raise e
+
+    return fn
+
+
+def minimum_required_fields_request_sample(sender_app, receiver_app, amount=AMOUNT, currency=&#34;XUS&#34;):
+    return {
+        &#34;_ObjectType&#34;: &#34;CommandRequestObject&#34;,
+        &#34;cid&#34;: &#34;3185027f-0574-6f55-2668-3a38fdb5de98&#34;,
+        &#34;command_type&#34;: &#34;PaymentCommand&#34;,
+        &#34;command&#34;: {
+            &#34;_ObjectType&#34;: &#34;PaymentCommand&#34;,
+            &#34;payment&#34;: {
+                &#34;reference_id&#34;: &#34;4185027f-0574-6f55-2668-3a38fdb5de98&#34;,
+                &#34;sender&#34;: {
+                    &#34;address&#34;: sender_app.gen_user_account_id(&#34;foo&#34;),
+                    &#34;status&#34;: {&#34;status&#34;: &#34;needs_kyc_data&#34;},
+                    &#34;kyc_data&#34;: {
+                        &#34;type&#34;: &#34;individual&#34;,
+                        &#34;payload_version&#34;: 1,
+                        &#34;national_id&#34;: {&#34;id_value&#34;: &#34;332-323-4344&#34;},
+                    },
+                },
+                &#34;receiver&#34;: {
+                    &#34;address&#34;: receiver_app.gen_user_account_id(&#34;bar&#34;),
+                    &#34;status&#34;: {&#34;status&#34;: &#34;none&#34;},
+                },
+                &#34;action&#34;: {
+                    &#34;amount&#34;: amount,
+                    &#34;currency&#34;: currency,
+                    &#34;action&#34;: &#34;charge&#34;,
+                    &#34;timestamp&#34;: 1604902048,
+                },
+            },
+        },
+    }</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="examples.vasp.test_offchain_error_cases.assert_invalid_overwrite_error"><code class="name flex">
+<span>def <span class="ident">assert_invalid_overwrite_error</span></span>(<span>sender_app, receiver_app, field, update_cmd, original_payment_reference_id=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def assert_invalid_overwrite_error(sender_app, receiver_app, field, update_cmd, original_payment_reference_id=None):
+    # setup soft match for sender provide additional_kyc_data
+    receiver_app.evaluate_kyc_data_result = {&#34;foo&#34;: ActionResult.SOFT_MATCH}
+    receiver_app.manual_review_result = {&#34;foo&#34;: ActionResult.PASS}
+
+    intent_id = receiver_app.gen_intent_id(&#34;bar&#34;, AMOUNT)
+    ref_id = sender_app.pay(
+        &#34;foo&#34;, intent_id, original_payment_reference_id=original_payment_reference_id, desc=&#34;this is a good deal&#34;
+    )
+    assert sender_app.run_once_background_job() == ActionResult.SEND_REQUEST_SUCCESS
+
+    assert receiver_app.run_once_background_job() == (
+        Action.EVALUATE_KYC_DATA,
+        ActionResult.SOFT_MATCH,
+    )
+    assert receiver_app.run_once_background_job() == ActionResult.SEND_REQUEST_SUCCESS
+    assert sender_app.run_once_background_job() == (
+        Action.CLEAR_SOFT_MATCH,
+        ActionResult.SENT_ADDITIONAL_KYC_DATA,
+    )
+    assert sender_app.run_once_background_job() == ActionResult.SEND_REQUEST_SUCCESS
+    assert receiver_app.run_once_background_job() == (
+        Action.REVIEW_KYC_DATA,
+        ActionResult.PASS,
+    )
+    assert receiver_app.run_once_background_job() == ActionResult.SEND_REQUEST_SUCCESS
+
+    # sender provided kyc_data and additional_kyc_data
+    # receiver provided signature and kyc_data
+
+    assert len(sender_app.saved_commands) == 1
+
+    cmd = sender_app.saved_commands.get(ref_id)
+    sender_app.saved_commands[ref_id] = update_cmd(cmd)
+
+    assert sender_app.run_once_background_job() == (
+        Action.EVALUATE_KYC_DATA,
+        ActionResult.PASS,
+    )
+    with pytest.raises(CommandResponseError) as err:
+        sender_app.run_once_background_job()
+
+    assert_response_command_error(err.value.resp, &#34;invalid_overwrite&#34;, field)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.assert_response_command_error"><code class="name flex">
+<span>def <span class="ident">assert_response_command_error</span></span>(<span>resp, code, field=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def assert_response_command_error(resp, code, field=None):
+    assert_response_error(resp, code, &#34;command_error&#34;, field)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.assert_response_error"><code class="name flex">
+<span>def <span class="ident">assert_response_error</span></span>(<span>resp, code, err_type, field=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def assert_response_error(resp, code, err_type, field=None):
+    assert resp.error, resp
+    assert resp.error.type == err_type, resp
+    assert resp.error.code == code, resp
+    assert resp.error.field == field, resp</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.assert_response_protocol_error"><code class="name flex">
+<span>def <span class="ident">assert_response_protocol_error</span></span>(<span>resp, code, field=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def assert_response_protocol_error(resp, code, field=None):
+    assert_response_error(resp, code, &#34;protocol_error&#34;, field)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.find_all_fields"><code class="name flex">
+<span>def <span class="ident">find_all_fields</span></span>(<span>dic)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_all_fields(dic):
+    ret = []
+    for key in dic:
+        ret.append(key)
+        if isinstance(dic[key], dict):
+            sub_fields = find_all_fields(dic[key])
+            for sf in sub_fields:
+                ret.append(&#34;.&#34;.join([key, sf]))
+    return ret</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.minimum_required_fields_request_sample"><code class="name flex">
+<span>def <span class="ident">minimum_required_fields_request_sample</span></span>(<span>sender_app, receiver_app, amount=1000000000, currency='XUS')</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def minimum_required_fields_request_sample(sender_app, receiver_app, amount=AMOUNT, currency=&#34;XUS&#34;):
+    return {
+        &#34;_ObjectType&#34;: &#34;CommandRequestObject&#34;,
+        &#34;cid&#34;: &#34;3185027f-0574-6f55-2668-3a38fdb5de98&#34;,
+        &#34;command_type&#34;: &#34;PaymentCommand&#34;,
+        &#34;command&#34;: {
+            &#34;_ObjectType&#34;: &#34;PaymentCommand&#34;,
+            &#34;payment&#34;: {
+                &#34;reference_id&#34;: &#34;4185027f-0574-6f55-2668-3a38fdb5de98&#34;,
+                &#34;sender&#34;: {
+                    &#34;address&#34;: sender_app.gen_user_account_id(&#34;foo&#34;),
+                    &#34;status&#34;: {&#34;status&#34;: &#34;needs_kyc_data&#34;},
+                    &#34;kyc_data&#34;: {
+                        &#34;type&#34;: &#34;individual&#34;,
+                        &#34;payload_version&#34;: 1,
+                        &#34;national_id&#34;: {&#34;id_value&#34;: &#34;332-323-4344&#34;},
+                    },
+                },
+                &#34;receiver&#34;: {
+                    &#34;address&#34;: receiver_app.gen_user_account_id(&#34;bar&#34;),
+                    &#34;status&#34;: {&#34;status&#34;: &#34;none&#34;},
+                },
+                &#34;action&#34;: {
+                    &#34;amount&#34;: amount,
+                    &#34;currency&#34;: currency,
+                    &#34;action&#34;: &#34;charge&#34;,
+                    &#34;timestamp&#34;: 1604902048,
+                },
+            },
+        },
+    }</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.raise_error"><code class="name flex">
+<span>def <span class="ident">raise_error</span></span>(<span>e: Exception)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def raise_error(e: Exception):
+    def fn(*args, **wargs):
+        raise e
+
+    return fn</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.replace_actor"><code class="name flex">
+<span>def <span class="ident">replace_actor</span></span>(<span>cmd, name, actor, **changes)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def replace_actor(cmd, name, actor, **changes):
+    new_actor = dataclasses.replace(actor, **changes)
+    return replace_command_payment(cmd, **{name: new_actor})</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.replace_command_payment"><code class="name flex">
+<span>def <span class="ident">replace_command_payment</span></span>(<span>cmd, **changes)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def replace_command_payment(cmd, **changes):
+    new_payment = dataclasses.replace(cmd.payment, **changes)
+    return dataclasses.replace(cmd, payment=new_payment)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.replace_command_sender"><code class="name flex">
+<span>def <span class="ident">replace_command_sender</span></span>(<span>cmd, **changes)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def replace_command_sender(cmd, **changes):
+    return replace_actor(cmd, &#34;sender&#34;, cmd.payment.sender, **changes)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.send_request"><code class="name flex">
+<span>def <span class="ident">send_request</span></span>(<span>request, sender_app, receiver_app, expected_resp_status, sender_address=None) ‑> diem.offchain.types.command_types.CommandResponseObject</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def send_request(request, sender_app, receiver_app, expected_resp_status, sender_address=None) -&gt; CommandResponseObject:
+    return send_request_json(json.dumps(request), sender_app, receiver_app, expected_resp_status, sender_address)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.send_request_json"><code class="name flex">
+<span>def <span class="ident">send_request_json</span></span>(<span>request_json, sender_app, receiver_app, expected_resp_status, sender_address=None) ‑> diem.offchain.types.command_types.CommandResponseObject</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def send_request_json(
+    request_json, sender_app, receiver_app, expected_resp_status, sender_address=None
+) -&gt; CommandResponseObject:
+    if sender_address is None:
+        subaddresses = sender_app.users[&#34;foo&#34;].subaddresses
+        subaddress = subaddresses[len(subaddresses) - 1] if len(subaddresses) &gt; 0 else None
+        account_address = sender_app._available_child_vasp().account_address
+        sender_address = identifier.encode_account(account_address, subaddress, sender_app.hrp)
+    return send_request_json_with_headers(
+        request_json,
+        sender_app,
+        receiver_app,
+        expected_resp_status,
+        {
+            http_header.X_REQUEST_ID: str(uuid.uuid4()),
+            http_header.X_REQUEST_SENDER_ADDRESS: sender_address,
+        },
+    )</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.send_request_json_with_headers"><code class="name flex">
+<span>def <span class="ident">send_request_json_with_headers</span></span>(<span>request_json, sender_app, receiver_app, expected_resp_status, headers) ‑> diem.offchain.types.command_types.CommandResponseObject</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def send_request_json_with_headers(
+    request_json, sender_app, receiver_app, expected_resp_status, headers
+) -&gt; CommandResponseObject:
+    session = requests.Session()
+    resp = session.post(
+        f&#34;http://localhost:{receiver_app.offchain_service_port}/v2/command&#34;,
+        data=jws.serialize_string(request_json, sender_app.compliance_key.sign),
+        headers=headers,
+    )
+
+    cmd_resp_obj = jws.deserialize(
+        resp.content,
+        CommandResponseObject,
+        receiver_app.compliance_key.public_key().verify,
+    )
+    assert cmd_resp_obj.status == expected_resp_status
+    if expected_resp_status == &#34;success&#34;:
+        assert resp.status_code == 200
+    else:
+        assert resp.status_code == 400
+
+    return cmd_resp_obj</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.sender_status"><code class="name flex">
+<span>def <span class="ident">sender_status</span></span>(<span>wallet, ref_id)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sender_status(wallet, ref_id):
+    command = wallet.saved_commands[ref_id]
+    return command.payment.sender.status.status</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.set_field"><code class="name flex">
+<span>def <span class="ident">set_field</span></span>(<span>dic, field, value)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_field(dic, field, value):
+    path = field.split(&#34;.&#34;)
+    for f in path[0 : len(path) - 1]:
+        if f not in dic:
+            dic[f] = {}
+        dic = dic[f]
+
+    dic[path[len(path) - 1]] = value</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_cid_uuid"><code class="name flex">
+<span>def <span class="ident">test_cid_uuid</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_cid_uuid(sender_app, receiver_app):
+    request = minimum_required_fields_request_sample(sender_app, receiver_app)
+    request[&#34;cid&#34;] = &#34;invalid uuid&#34;
+    resp = send_request(request, sender_app, receiver_app, &#34;failure&#34;)
+    assert_response_command_error(resp, &#34;invalid_field_value&#34;, &#34;cid&#34;)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_could_not_find_compliance_key_of_x_request_sender_address"><code class="name flex">
+<span>def <span class="ident">test_could_not_find_compliance_key_of_x_request_sender_address</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_could_not_find_compliance_key_of_x_request_sender_address(sender_app, receiver_app):
+    account = testnet.gen_account(testnet.create_client())
+    account_id = identifier.encode_account(account.account_address, None, sender_app.hrp)
+    request = minimum_required_fields_request_sample(sender_app, receiver_app)
+    request[&#34;command&#34;][&#34;payment&#34;][&#34;sender&#34;][&#34;address&#34;] = account_id
+    resp = send_request(request, sender_app, receiver_app, &#34;failure&#34;, sender_address=account_id)
+    assert_response_protocol_error(resp, &#34;invalid_x_request_sender_address&#34;)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_could_not_find_onchain_account_by_x_request_sender_address"><code class="name flex">
+<span>def <span class="ident">test_could_not_find_onchain_account_by_x_request_sender_address</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_could_not_find_onchain_account_by_x_request_sender_address(sender_app, receiver_app):
+    account = LocalAccount.generate()
+    account_id = identifier.encode_account(account.account_address, None, sender_app.hrp)
+    request = minimum_required_fields_request_sample(sender_app, receiver_app)
+    request[&#34;command&#34;][&#34;payment&#34;][&#34;sender&#34;][&#34;address&#34;] = account_id
+    resp = send_request(request, sender_app, receiver_app, &#34;failure&#34;, sender_address=account_id)
+    assert_response_protocol_error(resp, &#34;invalid_x_request_sender_address&#34;)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_http_header_x_request_sender_address_missing"><code class="name flex">
+<span>def <span class="ident">test_http_header_x_request_sender_address_missing</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_http_header_x_request_sender_address_missing(sender_app, receiver_app):
+    request = minimum_required_fields_request_sample(sender_app, receiver_app)
+    resp = send_request_json_with_headers(
+        json.dumps(request), sender_app, receiver_app, &#34;failure&#34;, {http_header.X_REQUEST_ID: str(uuid.uuid4())}
+    )
+    assert_response_protocol_error(resp, &#34;missing_http_header&#34;)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_invalid_actor_metadata_item_type"><code class="name flex">
+<span>def <span class="ident">test_invalid_actor_metadata_item_type</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_invalid_actor_metadata_item_type(sender_app, receiver_app):
+    request = minimum_required_fields_request_sample(sender_app, receiver_app)
+
+    field = &#34;command.payment.sender.metadata&#34;
+    set_field(request, field, [&#34;1&#34;, 2])
+    resp = send_request(request, sender_app, receiver_app, &#34;failure&#34;)
+    assert_response_command_error(resp, &#34;invalid_field_value&#34;, field)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_invalid_command_request_json"><code class="name flex">
+<span>def <span class="ident">test_invalid_command_request_json</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_invalid_command_request_json(sender_app, receiver_app):
+    resp = send_request(&#34;invalid_request_json&#34;, sender_app, receiver_app, &#34;failure&#34;)
+
+    assert resp.cid is None
+    assert_response_command_error(resp, &#34;invalid_object&#34;)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_invalid_currency_code"><code class="name flex">
+<span>def <span class="ident">test_invalid_currency_code</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_invalid_currency_code(sender_app, receiver_app):
+    request = minimum_required_fields_request_sample(sender_app, receiver_app, currency=&#34;XXX&#34;)
+
+    resp = send_request(request, sender_app, receiver_app, &#34;failure&#34;)
+    assert_response_command_error(resp, &#34;invalid_field_value&#34;, &#34;command.payment.action.currency&#34;)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_invalid_field_value"><code class="name flex">
+<span>def <span class="ident">test_invalid_field_value</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_invalid_field_value(sender_app, receiver_app):
+    request = minimum_required_fields_request_sample(sender_app, receiver_app)
+
+    fields = [
+        &#34;_ObjectType&#34;,
+        &#34;command_type&#34;,
+        &#34;command._ObjectType&#34;,
+        &#34;command.payment.action.action&#34;,
+        &#34;command.payment.receiver.status.status&#34;,
+        &#34;command.payment.receiver.address&#34;,
+        &#34;command.payment.sender.address&#34;,
+        &#34;command.payment.sender.status.status&#34;,
+        &#34;command.payment.sender.kyc_data.type&#34;,
+        &#34;command.payment.sender.kyc_data.payload_version&#34;,
+    ]
+    for field in fields:
+        new_req = copy.deepcopy(request)
+        set_field(new_req, field, &#34;invalid-value&#34;)
+        resp = send_request(new_req, sender_app, receiver_app, &#34;failure&#34;)
+        assert_response_command_error(resp, &#34;invalid_field_value&#34;, field)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_invalid_field_value_type"><code class="name flex">
+<span>def <span class="ident">test_invalid_field_value_type</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_invalid_field_value_type(sender_app, receiver_app):
+    request = minimum_required_fields_request_sample(sender_app, receiver_app)
+
+    fields = [
+        &#34;command.payment.sender.status&#34;,  # status is object, status.status is status enum string
+        &#34;command.payment.sender.metadata&#34;,
+    ]
+    for field in fields:
+        new_req = copy.deepcopy(request)
+        set_field(new_req, field, &#34;invalid-value-type&#34;)
+        resp = send_request(new_req, sender_app, receiver_app, &#34;failure&#34;)
+        assert_response_command_error(resp, &#34;invalid_field_value&#34;, field)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_invalid_json"><code class="name flex">
+<span>def <span class="ident">test_invalid_json</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_invalid_json(sender_app, receiver_app):
+    resp = send_request_json(&#34;invalid_json&#34;, sender_app, receiver_app, &#34;failure&#34;)
+
+    assert resp.cid is None
+    assert_response_command_error(resp, &#34;invalid_json&#34;)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_invalid_recipient_signature"><code class="name flex">
+<span>def <span class="ident">test_invalid_recipient_signature</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_invalid_recipient_signature(sender_app, receiver_app):
+    intent_id = receiver_app.gen_intent_id(&#34;bar&#34;, AMOUNT)
+    ref_id = sender_app.pay(&#34;foo&#34;, intent_id)
+    assert sender_app.run_once_background_job() == ActionResult.SEND_REQUEST_SUCCESS
+
+    assert receiver_app.run_once_background_job() == (
+        Action.EVALUATE_KYC_DATA,
+        ActionResult.PASS,
+    )
+    cmd = receiver_app.saved_commands.get(ref_id)
+    invalid_sig_cmd = replace_command_payment(cmd, recipient_signature=b&#34;invalid-sig&#34;.hex())
+    with pytest.raises(CommandResponseError) as err:
+        assert receiver_app._send_request(invalid_sig_cmd)
+
+    assert_response_command_error(err.value.resp, &#34;invalid_recipient_signature&#34;, &#34;command.payment.recipient_signature&#34;)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_invalid_recipient_signature_hex"><code class="name flex">
+<span>def <span class="ident">test_invalid_recipient_signature_hex</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_invalid_recipient_signature_hex(sender_app, receiver_app):
+    intent_id = receiver_app.gen_intent_id(&#34;bar&#34;, AMOUNT)
+    ref_id = sender_app.pay(&#34;foo&#34;, intent_id)
+    assert sender_app.run_once_background_job() == ActionResult.SEND_REQUEST_SUCCESS
+
+    assert receiver_app.run_once_background_job() == (
+        Action.EVALUATE_KYC_DATA,
+        ActionResult.PASS,
+    )
+    cmd = receiver_app.saved_commands.get(ref_id)
+    invalid_sig_cmd = replace_command_payment(cmd, recipient_signature=&#34;invalid-sig-hex&#34;)
+    with pytest.raises(CommandResponseError) as err:
+        assert receiver_app._send_request(invalid_sig_cmd)
+
+    assert_response_command_error(err.value.resp, &#34;invalid_recipient_signature&#34;, &#34;command.payment.recipient_signature&#34;)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_missing_required_fields"><code class="name flex">
+<span>def <span class="ident">test_missing_required_fields</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_missing_required_fields(sender_app, receiver_app):
+    request = minimum_required_fields_request_sample(sender_app, receiver_app)
+    assert send_request(request, sender_app, receiver_app, &#34;success&#34;)
+
+    for field in find_all_fields(request):
+        # ignore national_id which is optional, the id_value in national_id is required
+        if field in [&#34;command.payment.sender.kyc_data.national_id&#34;]:
+            continue
+        new_req = copy.deepcopy(request)
+        set_field(new_req, field, None)
+        resp = send_request(new_req, sender_app, receiver_app, &#34;failure&#34;)
+        assert_response_command_error(resp, &#34;missing_field&#34;, field)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_receiver_actor_is_ready_for_settlement_but_recipient_signature_is_none"><code class="name flex">
+<span>def <span class="ident">test_receiver_actor_is_ready_for_settlement_but_recipient_signature_is_none</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_receiver_actor_is_ready_for_settlement_but_recipient_signature_is_none(sender_app, receiver_app):
+    intent_id = receiver_app.gen_intent_id(&#34;bar&#34;, AMOUNT)
+    ref_id = sender_app.pay(&#34;foo&#34;, intent_id)
+    assert sender_app.run_once_background_job() == ActionResult.SEND_REQUEST_SUCCESS
+
+    assert receiver_app.run_once_background_job() == (
+        Action.EVALUATE_KYC_DATA,
+        ActionResult.PASS,
+    )
+    cmd = receiver_app.saved_commands.get(ref_id)
+    missing_sig_cmd = replace_command_payment(cmd, recipient_signature=None)
+    with pytest.raises(CommandResponseError) as err:
+        assert receiver_app._send_request(missing_sig_cmd)
+
+    assert_response_command_error(err.value.resp, &#34;missing_field&#34;, &#34;command.payment.recipient_signature&#34;)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_reference_id_uuid"><code class="name flex">
+<span>def <span class="ident">test_reference_id_uuid</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_reference_id_uuid(sender_app, receiver_app):
+    request = minimum_required_fields_request_sample(sender_app, receiver_app)
+    request[&#34;command&#34;][&#34;payment&#34;][&#34;reference_id&#34;] = &#34;invalid uuid&#34;
+    resp = send_request(request, sender_app, receiver_app, &#34;failure&#34;)
+    assert_response_command_error(resp, &#34;invalid_field_value&#34;, &#34;command.payment.reference_id&#34;)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_resource_is_locked_error"><code class="name flex">
+<span>def <span class="ident">test_resource_is_locked_error</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_resource_is_locked_error(sender_app, receiver_app):
+    intent_id = receiver_app.gen_intent_id(&#34;bar&#34;, AMOUNT)
+    ref_id = sender_app.pay(&#34;foo&#34;, intent_id)
+    assert sender_app.run_once_background_job() == ActionResult.SEND_REQUEST_SUCCESS
+
+    sender_app.lock(ref_id).acquire()
+    assert receiver_app.run_once_background_job() == (
+        Action.EVALUATE_KYC_DATA,
+        ActionResult.PASS,
+    )
+    with pytest.raises(CommandResponseError) as err:
+        receiver_app.run_once_background_job()
+
+    assert_response_command_error(err.value.resp, &#34;conflict&#34;)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_send_command_failed_by_invalid_jws_signature_and_retry_by_bg_job"><code class="name flex">
+<span>def <span class="ident">test_send_command_failed_by_invalid_jws_signature_and_retry_by_bg_job</span></span>(<span>monkeypatch, sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_send_command_failed_by_invalid_jws_signature_and_retry_by_bg_job(monkeypatch, sender_app, receiver_app):
+    intent_id = receiver_app.gen_intent_id(&#34;bar&#34;, AMOUNT)
+
+    with monkeypatch.context() as m:
+        m.setattr(sender_app, &#34;compliance_key&#34;, LocalAccount.generate().compliance_key)
+        sender_app.pay(&#34;foo&#34;, intent_id)
+
+        assert len(sender_app.saved_commands) == 1
+        assert len(receiver_app.saved_commands) == 0
+
+        with pytest.raises(CommandResponseError) as err:
+            sender_app.run_once_background_job()
+
+        assert_response_command_error(err.value.resp, &#34;invalid_jws_signature&#34;)
+
+        assert len(sender_app.saved_commands) == 1
+        assert len(receiver_app.saved_commands) == 0
+
+    assert sender_app.run_once_background_job() == ActionResult.SEND_REQUEST_SUCCESS
+
+    assert len(sender_app.saved_commands) == 1
+    assert len(receiver_app.saved_commands) == 1
+
+    # receiver_app continues the flow after error is recovered
+    assert receiver_app.run_once_background_job() == (
+        Action.EVALUATE_KYC_DATA,
+        ActionResult.PASS,
+    )</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_send_command_failed_by_server_internal_error_and_retry_by_bg_job"><code class="name flex">
+<span>def <span class="ident">test_send_command_failed_by_server_internal_error_and_retry_by_bg_job</span></span>(<span>monkeypatch, sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_send_command_failed_by_server_internal_error_and_retry_by_bg_job(monkeypatch, sender_app, receiver_app):
+    intent_id = receiver_app.gen_intent_id(&#34;bar&#34;, AMOUNT)
+
+    with monkeypatch.context() as m:
+        # receiver side save request failed, which causes 500 error to sender client
+        m.setattr(
+            receiver_app,
+            &#34;save_command&#34;,
+            raise_error(Exception(&#34;simulate receiver app internal error&#34;)),
+        )
+        reference_id = sender_app.pay(&#34;foo&#34;, intent_id)
+        with pytest.raises(Exception):
+            sender_app.run_once_background_job()
+
+        assert len(sender_app.saved_commands) == 1
+        assert len(receiver_app.saved_commands) == 0
+
+    assert sender_app.run_once_background_job() == ActionResult.SEND_REQUEST_SUCCESS
+
+    assert len(sender_app.saved_commands) == 1
+    assert len(receiver_app.saved_commands) == 1
+
+    # receiver continues the flow after error is recovered
+    assert receiver_app.run_once_background_job() == (
+        Action.EVALUATE_KYC_DATA,
+        ActionResult.PASS,
+    )
+    assert receiver_app.run_once_background_job() == ActionResult.SEND_REQUEST_SUCCESS
+
+    with monkeypatch.context() as m:
+        # receiver side save request failed, which causes 500 error to sender client
+        m.setattr(
+            receiver_app,
+            &#34;save_command&#34;,
+            raise_error(Exception(&#34;simulate server internal error&#34;)),
+        )
+
+        # action success but send request should fail
+        assert sender_app.run_once_background_job() == (
+            Action.EVALUATE_KYC_DATA,
+            ActionResult.PASS,
+        )
+        with pytest.raises(Exception):
+            sender_app.run_once_background_job()
+
+        assert sender_status(sender_app, reference_id) == Status.ready_for_settlement
+        assert sender_status(receiver_app, reference_id) == Status.needs_kyc_data
+
+        # retry failed again
+        with pytest.raises(Exception):
+            sender_app.run_once_background_job()
+
+        assert sender_status(sender_app, reference_id) == Status.ready_for_settlement
+        assert sender_status(receiver_app, reference_id) == Status.needs_kyc_data
+
+    assert sender_app.run_once_background_job() == ActionResult.SEND_REQUEST_SUCCESS
+    assert sender_status(sender_app, reference_id) == Status.ready_for_settlement
+    assert sender_status(receiver_app, reference_id) == Status.ready_for_settlement</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_travel_rule_limit_validation"><code class="name flex">
+<span>def <span class="ident">test_travel_rule_limit_validation</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_travel_rule_limit_validation(sender_app, receiver_app):
+    request = minimum_required_fields_request_sample(sender_app, receiver_app, 10)
+
+    resp = send_request(request, sender_app, receiver_app, &#34;failure&#34;)
+    assert_response_command_error(resp, &#34;no_kyc_needed&#34;, &#34;command.payment.action.amount&#34;)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_unknown_actor_address_could_not_find_request_receiver_account_id"><code class="name flex">
+<span>def <span class="ident">test_unknown_actor_address_could_not_find_request_receiver_account_id</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_unknown_actor_address_could_not_find_request_receiver_account_id(sender_app, receiver_app):
+    request = minimum_required_fields_request_sample(sender_app, receiver_app)
+    request[&#34;command&#34;][&#34;payment&#34;][&#34;receiver&#34;][&#34;address&#34;] = sender_app.offchain_client.my_compliance_key_account_id
+    resp = send_request(request, sender_app, receiver_app, &#34;failure&#34;)
+    assert_response_command_error(resp, &#34;unknown_actor_address&#34;)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_unknown_fields"><code class="name flex">
+<span>def <span class="ident">test_unknown_fields</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_unknown_fields(sender_app, receiver_app):
+    request = minimum_required_fields_request_sample(sender_app, receiver_app)
+
+    for field in find_all_fields(request):
+        new_req = copy.deepcopy(request)
+        unknown_field = field + &#34;-unknown&#34;
+        set_field(new_req, unknown_field, &#34;any&#34;)
+        resp = send_request(new_req, sender_app, receiver_app, &#34;failure&#34;)
+        assert_response_command_error(resp, &#34;unknown_field&#34;, unknown_field)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_update_opponent_actor_field_error"><code class="name flex">
+<span>def <span class="ident">test_update_opponent_actor_field_error</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_update_opponent_actor_field_error(sender_app, receiver_app):
+    assert_invalid_overwrite_error(
+        sender_app,
+        receiver_app,
+        &#34;payment.receiver&#34;,
+        lambda cmd: replace_actor(cmd, &#34;receiver&#34;, cmd.payment.receiver, additional_kyc_data=&#34;random stuff&#34;),
+    )</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_written_once_payment_action"><code class="name flex">
+<span>def <span class="ident">test_written_once_payment_action</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_written_once_payment_action(sender_app, receiver_app):
+    assert_invalid_overwrite_error(
+        sender_app,
+        receiver_app,
+        &#34;payment.action&#34;,
+        lambda cmd: replace_command_payment(cmd, action=PaymentActionObject(amount=AMOUNT, currency=&#34;XDX&#34;)),
+    )</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_written_once_payment_actor_additional_kyc_data"><code class="name flex">
+<span>def <span class="ident">test_written_once_payment_actor_additional_kyc_data</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_written_once_payment_actor_additional_kyc_data(sender_app, receiver_app):
+    assert_invalid_overwrite_error(
+        sender_app,
+        receiver_app,
+        &#34;payment.sender.additional_kyc_data&#34;,
+        lambda cmd: replace_command_sender(cmd, additional_kyc_data=&#34;random stuff&#34;),
+    )</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_written_once_payment_actor_address"><code class="name flex">
+<span>def <span class="ident">test_written_once_payment_actor_address</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_written_once_payment_actor_address(sender_app, receiver_app):
+    new_sender_address = sender_app.gen_user_account_id(&#34;user-x&#34;)
+
+    def update_cmd(cmd):
+        cmd = replace_command_sender(cmd, address=new_sender_address)
+        return dataclasses.replace(cmd, my_actor_address=new_sender_address)
+
+    assert_invalid_overwrite_error(sender_app, receiver_app, &#34;payment.sender.address&#34;, update_cmd)</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_written_once_payment_actor_kyc_data"><code class="name flex">
+<span>def <span class="ident">test_written_once_payment_actor_kyc_data</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_written_once_payment_actor_kyc_data(sender_app, receiver_app):
+    assert_invalid_overwrite_error(
+        sender_app,
+        receiver_app,
+        &#34;payment.sender.kyc_data&#34;,
+        lambda cmd: replace_command_sender(cmd, kyc_data=sender_app.users[&#34;user-x&#34;].kyc_data()),
+    )</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_written_once_payment_description"><code class="name flex">
+<span>def <span class="ident">test_written_once_payment_description</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_written_once_payment_description(sender_app, receiver_app):
+    assert_invalid_overwrite_error(
+        sender_app,
+        receiver_app,
+        &#34;payment.description&#34;,
+        lambda cmd: replace_command_payment(cmd, description=&#34;want to change desc&#34;),
+    )</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_written_once_payment_original_payment_reference_id"><code class="name flex">
+<span>def <span class="ident">test_written_once_payment_original_payment_reference_id</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_written_once_payment_original_payment_reference_id(sender_app, receiver_app):
+    assert_invalid_overwrite_error(
+        sender_app,
+        receiver_app,
+        &#34;payment.original_payment_reference_id&#34;,
+        lambda cmd: replace_command_payment(cmd, original_payment_reference_id=&#34;4185027f-0574-6f55-2668-3a38fdb5de98&#34;),
+        original_payment_reference_id=&#34;6185027f-0574-6f55-2668-3a38fdb5de98&#34;,
+    )</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_written_once_payment_original_payment_reference_id_initial_only"><code class="name flex">
+<span>def <span class="ident">test_written_once_payment_original_payment_reference_id_initial_only</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_written_once_payment_original_payment_reference_id_initial_only(sender_app, receiver_app):
+    assert_invalid_overwrite_error(
+        sender_app,
+        receiver_app,
+        &#34;payment.original_payment_reference_id&#34;,
+        lambda cmd: replace_command_payment(cmd, original_payment_reference_id=&#34;4185027f-0574-6f55-2668-3a38fdb5de98&#34;),
+    )</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_written_once_payment_recipient_signature"><code class="name flex">
+<span>def <span class="ident">test_written_once_payment_recipient_signature</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_written_once_payment_recipient_signature(sender_app, receiver_app):
+    assert_invalid_overwrite_error(
+        sender_app,
+        receiver_app,
+        &#34;payment.recipient_signature&#34;,
+        lambda cmd: replace_command_payment(cmd, recipient_signature=&#34;sig&#34;),
+    )</code></pre>
+</details>
+</dd>
+<dt id="examples.vasp.test_offchain_error_cases.test_x_request_sender_address_must_one_of_actor_addresses"><code class="name flex">
+<span>def <span class="ident">test_x_request_sender_address_must_one_of_actor_addresses</span></span>(<span>sender_app, receiver_app)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_x_request_sender_address_must_one_of_actor_addresses(sender_app, receiver_app):
+    request = minimum_required_fields_request_sample(sender_app, receiver_app)
+    resp = send_request(
+        request,
+        sender_app,
+        receiver_app,
+        &#34;failure&#34;,
+        sender_address=sender_app.offchain_client.my_compliance_key_account_id,
+    )
+    assert_response_command_error(resp, &#34;invalid_x_request_sender_address&#34;)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="examples.vasp" href="index.html">examples.vasp</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="examples.vasp.test_offchain_error_cases.assert_invalid_overwrite_error" href="#examples.vasp.test_offchain_error_cases.assert_invalid_overwrite_error">assert_invalid_overwrite_error</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.assert_response_command_error" href="#examples.vasp.test_offchain_error_cases.assert_response_command_error">assert_response_command_error</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.assert_response_error" href="#examples.vasp.test_offchain_error_cases.assert_response_error">assert_response_error</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.assert_response_protocol_error" href="#examples.vasp.test_offchain_error_cases.assert_response_protocol_error">assert_response_protocol_error</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.find_all_fields" href="#examples.vasp.test_offchain_error_cases.find_all_fields">find_all_fields</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.minimum_required_fields_request_sample" href="#examples.vasp.test_offchain_error_cases.minimum_required_fields_request_sample">minimum_required_fields_request_sample</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.raise_error" href="#examples.vasp.test_offchain_error_cases.raise_error">raise_error</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.replace_actor" href="#examples.vasp.test_offchain_error_cases.replace_actor">replace_actor</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.replace_command_payment" href="#examples.vasp.test_offchain_error_cases.replace_command_payment">replace_command_payment</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.replace_command_sender" href="#examples.vasp.test_offchain_error_cases.replace_command_sender">replace_command_sender</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.send_request" href="#examples.vasp.test_offchain_error_cases.send_request">send_request</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.send_request_json" href="#examples.vasp.test_offchain_error_cases.send_request_json">send_request_json</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.send_request_json_with_headers" href="#examples.vasp.test_offchain_error_cases.send_request_json_with_headers">send_request_json_with_headers</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.sender_status" href="#examples.vasp.test_offchain_error_cases.sender_status">sender_status</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.set_field" href="#examples.vasp.test_offchain_error_cases.set_field">set_field</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_cid_uuid" href="#examples.vasp.test_offchain_error_cases.test_cid_uuid">test_cid_uuid</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_could_not_find_compliance_key_of_x_request_sender_address" href="#examples.vasp.test_offchain_error_cases.test_could_not_find_compliance_key_of_x_request_sender_address">test_could_not_find_compliance_key_of_x_request_sender_address</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_could_not_find_onchain_account_by_x_request_sender_address" href="#examples.vasp.test_offchain_error_cases.test_could_not_find_onchain_account_by_x_request_sender_address">test_could_not_find_onchain_account_by_x_request_sender_address</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_http_header_x_request_sender_address_missing" href="#examples.vasp.test_offchain_error_cases.test_http_header_x_request_sender_address_missing">test_http_header_x_request_sender_address_missing</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_invalid_actor_metadata_item_type" href="#examples.vasp.test_offchain_error_cases.test_invalid_actor_metadata_item_type">test_invalid_actor_metadata_item_type</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_invalid_command_request_json" href="#examples.vasp.test_offchain_error_cases.test_invalid_command_request_json">test_invalid_command_request_json</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_invalid_currency_code" href="#examples.vasp.test_offchain_error_cases.test_invalid_currency_code">test_invalid_currency_code</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_invalid_field_value" href="#examples.vasp.test_offchain_error_cases.test_invalid_field_value">test_invalid_field_value</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_invalid_field_value_type" href="#examples.vasp.test_offchain_error_cases.test_invalid_field_value_type">test_invalid_field_value_type</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_invalid_json" href="#examples.vasp.test_offchain_error_cases.test_invalid_json">test_invalid_json</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_invalid_recipient_signature" href="#examples.vasp.test_offchain_error_cases.test_invalid_recipient_signature">test_invalid_recipient_signature</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_invalid_recipient_signature_hex" href="#examples.vasp.test_offchain_error_cases.test_invalid_recipient_signature_hex">test_invalid_recipient_signature_hex</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_missing_required_fields" href="#examples.vasp.test_offchain_error_cases.test_missing_required_fields">test_missing_required_fields</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_receiver_actor_is_ready_for_settlement_but_recipient_signature_is_none" href="#examples.vasp.test_offchain_error_cases.test_receiver_actor_is_ready_for_settlement_but_recipient_signature_is_none">test_receiver_actor_is_ready_for_settlement_but_recipient_signature_is_none</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_reference_id_uuid" href="#examples.vasp.test_offchain_error_cases.test_reference_id_uuid">test_reference_id_uuid</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_resource_is_locked_error" href="#examples.vasp.test_offchain_error_cases.test_resource_is_locked_error">test_resource_is_locked_error</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_send_command_failed_by_invalid_jws_signature_and_retry_by_bg_job" href="#examples.vasp.test_offchain_error_cases.test_send_command_failed_by_invalid_jws_signature_and_retry_by_bg_job">test_send_command_failed_by_invalid_jws_signature_and_retry_by_bg_job</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_send_command_failed_by_server_internal_error_and_retry_by_bg_job" href="#examples.vasp.test_offchain_error_cases.test_send_command_failed_by_server_internal_error_and_retry_by_bg_job">test_send_command_failed_by_server_internal_error_and_retry_by_bg_job</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_travel_rule_limit_validation" href="#examples.vasp.test_offchain_error_cases.test_travel_rule_limit_validation">test_travel_rule_limit_validation</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_unknown_actor_address_could_not_find_request_receiver_account_id" href="#examples.vasp.test_offchain_error_cases.test_unknown_actor_address_could_not_find_request_receiver_account_id">test_unknown_actor_address_could_not_find_request_receiver_account_id</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_unknown_fields" href="#examples.vasp.test_offchain_error_cases.test_unknown_fields">test_unknown_fields</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_update_opponent_actor_field_error" href="#examples.vasp.test_offchain_error_cases.test_update_opponent_actor_field_error">test_update_opponent_actor_field_error</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_written_once_payment_action" href="#examples.vasp.test_offchain_error_cases.test_written_once_payment_action">test_written_once_payment_action</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_written_once_payment_actor_additional_kyc_data" href="#examples.vasp.test_offchain_error_cases.test_written_once_payment_actor_additional_kyc_data">test_written_once_payment_actor_additional_kyc_data</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_written_once_payment_actor_address" href="#examples.vasp.test_offchain_error_cases.test_written_once_payment_actor_address">test_written_once_payment_actor_address</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_written_once_payment_actor_kyc_data" href="#examples.vasp.test_offchain_error_cases.test_written_once_payment_actor_kyc_data">test_written_once_payment_actor_kyc_data</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_written_once_payment_description" href="#examples.vasp.test_offchain_error_cases.test_written_once_payment_description">test_written_once_payment_description</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_written_once_payment_original_payment_reference_id" href="#examples.vasp.test_offchain_error_cases.test_written_once_payment_original_payment_reference_id">test_written_once_payment_original_payment_reference_id</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_written_once_payment_original_payment_reference_id_initial_only" href="#examples.vasp.test_offchain_error_cases.test_written_once_payment_original_payment_reference_id_initial_only">test_written_once_payment_original_payment_reference_id_initial_only</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_written_once_payment_recipient_signature" href="#examples.vasp.test_offchain_error_cases.test_written_once_payment_recipient_signature">test_written_once_payment_recipient_signature</a></code></li>
+<li><code><a title="examples.vasp.test_offchain_error_cases.test_x_request_sender_address_must_one_of_actor_addresses" href="#examples.vasp.test_offchain_error_cases.test_x_request_sender_address_must_one_of_actor_addresses">test_x_request_sender_address_must_one_of_actor_addresses</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>
