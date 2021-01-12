@@ -29,12 +29,14 @@
 <pre><code class="python"># Copyright (c) The Diem Core Contributors
 # SPDX-License-Identifier: Apache-2.0
 
+
 import requests, typing, dataclasses, uuid
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from cryptography.exceptions import InvalidSignature
 from json.decoder import JSONDecodeError
 
+from .command import Command
 from .payment_command import PaymentCommand
 
 from .types import (
@@ -67,6 +69,47 @@ class CommandResponseError(Exception):
 
 @dataclasses.dataclass
 class Client:
+    &#34;&#34;&#34;Client for communicating with offchain service.
+
+    Provides outbound and inbound request handlings and convertings between bytes and offchain data types.
+
+    Initialization:
+    ```
+    &gt;&gt;&gt; from diem import offchain, jsonrpc, testnet, LocalAccount
+    &gt;&gt;&gt;
+    &gt;&gt;&gt; jsonrpc_client = testnet.create_client()
+    &gt;&gt;&gt; account = testnet.gen_vasp_account(client, &#34;http://vasp.com/offchain&#34;)
+    &gt;&gt;&gt; compliance_key_account_address = account.account_address
+    &gt;&gt;&gt; client = offchain.Client(compliance_key_account_address, jsonrpc_client, identifier.TDM)
+    ```
+
+    Send command:
+    ```
+    &gt;&gt;&gt; # for command: offchain.PaymentCommand
+    &gt;&gt;&gt; client.send_command(command, account.compliance_key.sign)
+    ```
+
+    Pre-process inbound request data:
+    ```
+    from http import server
+    from diem.offchain import X_REQUEST_ID, X_REQUEST_SENDER_ADDRESS
+
+    class Handler(server.BaseHTTPRequestHandler):
+        def do_POST(self):
+            x_request_id = self.headers[X_REQUEST_ID]
+            jws_key_address = self.headers[X_REQUEST_SENDER_ADDRESS]
+            length = int(self.headers[&#34;content-length&#34;])
+            content = self.rfile.read(length)
+
+            command = client.process_inbound_request(jws_key_address, content)
+            # validate and save command
+            ...
+
+    ```
+
+    See example [Wallet#process_inbound_request](https://diem.github.io/client-sdk-python/examples/vasp/wallet.html#examples.vasp.wallet.WalletApp.process_inbound_request) for full example of how to process inbound request.
+    &#34;&#34;&#34;
+
     my_compliance_key_account_address: diem_types.AccountAddress
     jsonrpc_client: jsonrpc.Client
     hrp: str
@@ -110,7 +153,27 @@ class Client:
             raise CommandResponseError(cmd_resp)
         return cmd_resp
 
-    def process_inbound_request(self, request_sender_address: str, request_bytes: bytes) -&gt; PaymentCommand:
+    def process_inbound_request(self, request_sender_address: str, request_bytes: bytes) -&gt; Command:
+        &#34;&#34;&#34;Validate and decode the `request_bytes` into `diem.offchain.command.Command` object.
+
+        Raises `diem.offchain.error.Error` with `protocol_error` when:
+
+        - `request_sender_address` is not provided.
+        - Cannot find on-chain account by the `request_sender_address`.
+        - Cannot get base url and public key from the on-chain account found by the `request_sender_address`.
+        - `request_bytes` is an invalid JWS message: JWS message format or content is invalid, or signature is invalid.
+        - Cannot decode `request_bytes` into `diem.offchain.types.command_types.CommandRequestObject`.
+        - Decoded `diem.offchain.types.command_types.CommandRequestObject` is invalid according to DIP-1 data structure requirements.
+
+        Raises `diem.offchain.error.Error` with `command_error` when `diem.offchain.types.command_types.CommandRequestObject.command` is `diem.offchain.payment_command.PaymentCommand`:
+
+        - `diem.offchain.types.payment_types.PaymentObject.sender` or `diem.offchain.types.payment_types.PaymentObject.sender`.address is invalid.
+        - `request_sender_address` is not sender or receiver actor address.
+        - For initial payment object, the `diem.offchain.types.payment_types.PaymentActionObject.amount` is under dual attestation limit (travel rule limit).
+        - When receiver actor statis is `ready_for_settlement`, the `recipient_signature` is not set or is invalid (verifying transaction metadata failed).
+
+        &#34;&#34;&#34;
+
         if not request_sender_address:
             raise protocol_error(ErrorCode.missing_http_header, f&#34;missing {http_header.X_REQUEST_SENDER_ADDRESS}&#34;)
         try:
@@ -244,13 +307,84 @@ def _deserialize_jws(
 <span>(</span><span>my_compliance_key_account_address: <a title="diem.diem_types.AccountAddress" href="../diem_types/index.html#diem.diem_types.AccountAddress">AccountAddress</a>, jsonrpc_client: <a title="diem.jsonrpc.client.Client" href="../jsonrpc/client.html#diem.jsonrpc.client.Client">Client</a>, hrp: str, session: requests.sessions.Session = &lt;factory&gt;, timeout: Tuple[float, float] = &lt;factory&gt;)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Client(my_compliance_key_account_address: diem.diem_types.AccountAddress, jsonrpc_client: diem.jsonrpc.client.Client, hrp: str, session: requests.sessions.Session = <factory>, timeout: Tuple[float, float] = <factory>)</p></div>
+<div class="desc"><p>Client for communicating with offchain service.</p>
+<p>Provides outbound and inbound request handlings and convertings between bytes and offchain data types.</p>
+<p>Initialization:</p>
+<pre><code>&gt;&gt;&gt; from diem import offchain, jsonrpc, testnet, LocalAccount
+&gt;&gt;&gt;
+&gt;&gt;&gt; jsonrpc_client = testnet.create_client()
+&gt;&gt;&gt; account = testnet.gen_vasp_account(client, &quot;http://vasp.com/offchain&quot;)
+&gt;&gt;&gt; compliance_key_account_address = account.account_address
+&gt;&gt;&gt; client = offchain.Client(compliance_key_account_address, jsonrpc_client, identifier.TDM)
+</code></pre>
+<p>Send command:</p>
+<pre><code>&gt;&gt;&gt; # for command: offchain.PaymentCommand
+&gt;&gt;&gt; client.send_command(command, account.compliance_key.sign)
+</code></pre>
+<p>Pre-process inbound request data:</p>
+<pre><code>from http import server
+from diem.offchain import X_REQUEST_ID, X_REQUEST_SENDER_ADDRESS
+
+class Handler(server.BaseHTTPRequestHandler):
+    def do_POST(self):
+        x_request_id = self.headers[X_REQUEST_ID]
+        jws_key_address = self.headers[X_REQUEST_SENDER_ADDRESS]
+        length = int(self.headers[&quot;content-length&quot;])
+        content = self.rfile.read(length)
+
+        command = client.process_inbound_request(jws_key_address, content)
+        # validate and save command
+        ...
+
+</code></pre>
+<p>See example <a href="https://diem.github.io/client-sdk-python/examples/vasp/wallet.html#examples.vasp.wallet.WalletApp.process_inbound_request">Wallet#process_inbound_request</a> for full example of how to process inbound request.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@dataclasses.dataclass
 class Client:
+    &#34;&#34;&#34;Client for communicating with offchain service.
+
+    Provides outbound and inbound request handlings and convertings between bytes and offchain data types.
+
+    Initialization:
+    ```
+    &gt;&gt;&gt; from diem import offchain, jsonrpc, testnet, LocalAccount
+    &gt;&gt;&gt;
+    &gt;&gt;&gt; jsonrpc_client = testnet.create_client()
+    &gt;&gt;&gt; account = testnet.gen_vasp_account(client, &#34;http://vasp.com/offchain&#34;)
+    &gt;&gt;&gt; compliance_key_account_address = account.account_address
+    &gt;&gt;&gt; client = offchain.Client(compliance_key_account_address, jsonrpc_client, identifier.TDM)
+    ```
+
+    Send command:
+    ```
+    &gt;&gt;&gt; # for command: offchain.PaymentCommand
+    &gt;&gt;&gt; client.send_command(command, account.compliance_key.sign)
+    ```
+
+    Pre-process inbound request data:
+    ```
+    from http import server
+    from diem.offchain import X_REQUEST_ID, X_REQUEST_SENDER_ADDRESS
+
+    class Handler(server.BaseHTTPRequestHandler):
+        def do_POST(self):
+            x_request_id = self.headers[X_REQUEST_ID]
+            jws_key_address = self.headers[X_REQUEST_SENDER_ADDRESS]
+            length = int(self.headers[&#34;content-length&#34;])
+            content = self.rfile.read(length)
+
+            command = client.process_inbound_request(jws_key_address, content)
+            # validate and save command
+            ...
+
+    ```
+
+    See example [Wallet#process_inbound_request](https://diem.github.io/client-sdk-python/examples/vasp/wallet.html#examples.vasp.wallet.WalletApp.process_inbound_request) for full example of how to process inbound request.
+    &#34;&#34;&#34;
+
     my_compliance_key_account_address: diem_types.AccountAddress
     jsonrpc_client: jsonrpc.Client
     hrp: str
@@ -294,7 +428,27 @@ class Client:
             raise CommandResponseError(cmd_resp)
         return cmd_resp
 
-    def process_inbound_request(self, request_sender_address: str, request_bytes: bytes) -&gt; PaymentCommand:
+    def process_inbound_request(self, request_sender_address: str, request_bytes: bytes) -&gt; Command:
+        &#34;&#34;&#34;Validate and decode the `request_bytes` into `diem.offchain.command.Command` object.
+
+        Raises `diem.offchain.error.Error` with `protocol_error` when:
+
+        - `request_sender_address` is not provided.
+        - Cannot find on-chain account by the `request_sender_address`.
+        - Cannot get base url and public key from the on-chain account found by the `request_sender_address`.
+        - `request_bytes` is an invalid JWS message: JWS message format or content is invalid, or signature is invalid.
+        - Cannot decode `request_bytes` into `diem.offchain.types.command_types.CommandRequestObject`.
+        - Decoded `diem.offchain.types.command_types.CommandRequestObject` is invalid according to DIP-1 data structure requirements.
+
+        Raises `diem.offchain.error.Error` with `command_error` when `diem.offchain.types.command_types.CommandRequestObject.command` is `diem.offchain.payment_command.PaymentCommand`:
+
+        - `diem.offchain.types.payment_types.PaymentObject.sender` or `diem.offchain.types.payment_types.PaymentObject.sender`.address is invalid.
+        - `request_sender_address` is not sender or receiver actor address.
+        - For initial payment object, the `diem.offchain.types.payment_types.PaymentActionObject.amount` is under dual attestation limit (travel rule limit).
+        - When receiver actor statis is `ready_for_settlement`, the `recipient_signature` is not set or is invalid (verifying transaction metadata failed).
+
+        &#34;&#34;&#34;
+
         if not request_sender_address:
             raise protocol_error(ErrorCode.missing_http_header, f&#34;missing {http_header.X_REQUEST_SENDER_ADDRESS}&#34;)
         try:
@@ -489,15 +643,51 @@ class Client:
 </details>
 </dd>
 <dt id="diem.offchain.client.Client.process_inbound_request"><code class="name flex">
-<span>def <span class="ident">process_inbound_request</span></span>(<span>self, request_sender_address: str, request_bytes: bytes) ‑> <a title="diem.offchain.payment_command.PaymentCommand" href="payment_command.html#diem.offchain.payment_command.PaymentCommand">PaymentCommand</a></span>
+<span>def <span class="ident">process_inbound_request</span></span>(<span>self, request_sender_address: str, request_bytes: bytes) ‑> <a title="diem.offchain.command.Command" href="command.html#diem.offchain.command.Command">Command</a></span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Validate and decode the <code>request_bytes</code> into <code><a title="diem.offchain.command.Command" href="command.html#diem.offchain.command.Command">Command</a></code> object.</p>
+<p>Raises <code><a title="diem.offchain.error.Error" href="error.html#diem.offchain.error.Error">Error</a></code> with <code>protocol_error</code> when:</p>
+<ul>
+<li><code>request_sender_address</code> is not provided.</li>
+<li>Cannot find on-chain account by the <code>request_sender_address</code>.</li>
+<li>Cannot get base url and public key from the on-chain account found by the <code>request_sender_address</code>.</li>
+<li><code>request_bytes</code> is an invalid JWS message: JWS message format or content is invalid, or signature is invalid.</li>
+<li>Cannot decode <code>request_bytes</code> into <code><a title="diem.offchain.types.command_types.CommandRequestObject" href="types/command_types.html#diem.offchain.types.command_types.CommandRequestObject">CommandRequestObject</a></code>.</li>
+<li>Decoded <code><a title="diem.offchain.types.command_types.CommandRequestObject" href="types/command_types.html#diem.offchain.types.command_types.CommandRequestObject">CommandRequestObject</a></code> is invalid according to DIP-1 data structure requirements.</li>
+</ul>
+<p>Raises <code><a title="diem.offchain.error.Error" href="error.html#diem.offchain.error.Error">Error</a></code> with <code>command_error</code> when <code><a title="diem.offchain.types.command_types.CommandRequestObject.command" href="types/command_types.html#diem.offchain.types.command_types.CommandRequestObject.command">CommandRequestObject.command</a></code> is <code><a title="diem.offchain.payment_command.PaymentCommand" href="payment_command.html#diem.offchain.payment_command.PaymentCommand">PaymentCommand</a></code>:</p>
+<ul>
+<li><code><a title="diem.offchain.types.payment_types.PaymentObject.sender" href="types/payment_types.html#diem.offchain.types.payment_types.PaymentObject.sender">PaymentObject.sender</a></code> or <code><a title="diem.offchain.types.payment_types.PaymentObject.sender" href="types/payment_types.html#diem.offchain.types.payment_types.PaymentObject.sender">PaymentObject.sender</a></code>.address is invalid.</li>
+<li><code>request_sender_address</code> is not sender or receiver actor address.</li>
+<li>For initial payment object, the <code><a title="diem.offchain.types.payment_types.PaymentActionObject.amount" href="types/payment_types.html#diem.offchain.types.payment_types.PaymentActionObject.amount">PaymentActionObject.amount</a></code> is under dual attestation limit (travel rule limit).</li>
+<li>When receiver actor statis is <code>ready_for_settlement</code>, the <code>recipient_signature</code> is not set or is invalid (verifying transaction metadata failed).</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def process_inbound_request(self, request_sender_address: str, request_bytes: bytes) -&gt; PaymentCommand:
+<pre><code class="python">def process_inbound_request(self, request_sender_address: str, request_bytes: bytes) -&gt; Command:
+    &#34;&#34;&#34;Validate and decode the `request_bytes` into `diem.offchain.command.Command` object.
+
+    Raises `diem.offchain.error.Error` with `protocol_error` when:
+
+    - `request_sender_address` is not provided.
+    - Cannot find on-chain account by the `request_sender_address`.
+    - Cannot get base url and public key from the on-chain account found by the `request_sender_address`.
+    - `request_bytes` is an invalid JWS message: JWS message format or content is invalid, or signature is invalid.
+    - Cannot decode `request_bytes` into `diem.offchain.types.command_types.CommandRequestObject`.
+    - Decoded `diem.offchain.types.command_types.CommandRequestObject` is invalid according to DIP-1 data structure requirements.
+
+    Raises `diem.offchain.error.Error` with `command_error` when `diem.offchain.types.command_types.CommandRequestObject.command` is `diem.offchain.payment_command.PaymentCommand`:
+
+    - `diem.offchain.types.payment_types.PaymentObject.sender` or `diem.offchain.types.payment_types.PaymentObject.sender`.address is invalid.
+    - `request_sender_address` is not sender or receiver actor address.
+    - For initial payment object, the `diem.offchain.types.payment_types.PaymentActionObject.amount` is under dual attestation limit (travel rule limit).
+    - When receiver actor statis is `ready_for_settlement`, the `recipient_signature` is not set or is invalid (verifying transaction metadata failed).
+
+    &#34;&#34;&#34;
+
     if not request_sender_address:
         raise protocol_error(ErrorCode.missing_http_header, f&#34;missing {http_header.X_REQUEST_SENDER_ADDRESS}&#34;)
     try:

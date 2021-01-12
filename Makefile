@@ -65,5 +65,6 @@ docs: init install
 	rm -rf docs/examples
 	./venv/bin/python3 -m pdoc diem --html -o docs
 	./venv/bin/python3 -m pdoc examples --html -o docs
+	rm -rf docs/examples/tests
 
 .PHONY: init check lint format install test cover build diemtypes protobuf gen dist pylama docs

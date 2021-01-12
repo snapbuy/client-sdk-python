@@ -29,6 +29,7 @@
 <pre><code class="python"># Copyright (c) The Diem Core Contributors
 # SPDX-License-Identifier: Apache-2.0
 
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from dataclasses import dataclass, field
 from http import server
 from diem import (
@@ -43,13 +44,13 @@ from diem import (
 )
 import logging, threading, typing
 
-logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
 class User:
     name: str
-    subaddresses: typing.List[str] = field(default_factory=lambda: [])
+    subaddresses: typing.List[bytes] = field(default_factory=lambda: [])
 
     def kyc_data(self) -&gt; offchain.KycDataObject:
         return offchain.individual_kyc_data(
@@ -62,22 +63,20 @@ class User:
         return f&#34;{self.name}&#39;s secret&#34;
 
 
-class ActionResult(str):
-    def merge(self, ret: str) -&gt; &#34;ActionResult&#34;:
-        if ret == ActionResult.SEND_REQUEST_SUCCESS:
-            return self
-        return self + &#34;, &#34; + ret
+class ActionResultType(str):
+    pass
 
 
-# the following ActionResult is created for testing purpose to indicate specific task is executed
-ActionResult.PASS = ActionResult(&#34;pass&#34;)
-ActionResult.REJECT = ActionResult(&#34;reject&#34;)
-ActionResult.SOFT_MATCH = ActionResult(&#34;soft_match&#34;)
-ActionResult.SENT_ADDITIONAL_KYC_DATA = ActionResult(&#34;sent_additional_kyc_data&#34;)
-ActionResult.TXN_EXECUTED = ActionResult(&#34;transaction_executed&#34;)
-ActionResult.SEND_REQUEST_SUCCESS = ActionResult(&#34;send_request_success&#34;)
+class ActionResult:
+    PASS = ActionResultType(&#34;pass&#34;)
+    REJECT = ActionResultType(&#34;reject&#34;)
+    SOFT_MATCH = ActionResultType(&#34;soft_match&#34;)
+    SENT_ADDITIONAL_KYC_DATA = ActionResultType(&#34;sent_additional_kyc_data&#34;)
+    TXN_EXECUTED = ActionResultType(&#34;transaction_executed&#34;)
+    SEND_REQUEST_SUCCESS = ActionResultType(&#34;send_request_success&#34;)
 
-BgResult = typing.Union[ActionResult, typing.Tuple[offchain.Action, ActionResult]]
+
+BgResult = typing.Tuple[typing.Optional[offchain.action.Action], ActionResultType]
 
 
 @dataclass
@@ -108,10 +107,12 @@ class WalletApp:
     saved_commands: typing.Dict[str, offchain.Command] = field(default_factory=lambda: {})
     child_vasps: typing.List[LocalAccount] = field(default_factory=lambda: [])
     users: typing.Dict[str, User] = field(default_factory=lambda: {})
-    evaluate_kyc_data_result: typing.Dict[str, ActionResult] = field(default_factory=lambda: {})
-    manual_review_result: typing.Dict[str, ActionResult] = field(default_factory=lambda: {})
+    evaluate_kyc_data_result: typing.Dict[str, ActionResultType] = field(default_factory=lambda: {})
+    manual_review_result: typing.Dict[str, ActionResultType] = field(default_factory=lambda: {})
     task_queue: typing.List[typing.Callable[[&#34;WalletApp&#34;], BgResult]] = field(default_factory=lambda: [])
     locks: typing.Dict[str, threading.Lock] = field(default_factory=lambda: {})
+    compliance_key: Ed25519PrivateKey = field(init=False)
+    offchain_client: offchain.Client = field(init=False)
 
     def __post_init__(self) -&gt; None:
         self.compliance_key = self.parent_vasp.compliance_key
@@ -125,7 +126,7 @@ class WalletApp:
         intent_id: str,
         desc: typing.Optional[str] = None,
         original_payment_reference_id: typing.Optional[str] = None,
-    ) -&gt; typing.Tuple[(str, ActionResult)]:
+    ) -&gt; str:
         &#34;&#34;&#34;make payment from given user account to intent_id&#34;&#34;&#34;
 
         intent = identifier.decode_intent(intent_id, self.hrp)
@@ -148,29 +149,30 @@ class WalletApp:
         currency: typing.Optional[str] = testnet.TEST_CURRENCY_CODE,
     ) -&gt; str:
         account_id = self.gen_user_account_id(user_name)
-        return identifier.encode_intent(account_id, currency, amount)
+        return identifier.encode_intent(account_id, str(currency), amount)
 
     # --------------------- offchain integration --------------------------
 
     def process_inbound_request(
         self, x_request_id: str, request_sender_address: str, request_bytes: bytes
     ) -&gt; typing.Tuple[int, bytes]:
-        inbound_command = None
+        cid = None
         try:
             inbound_command = self.offchain_client.process_inbound_request(request_sender_address, request_bytes)
+            cid = inbound_command.id()
             self.save_command(inbound_command)
-            resp = offchain.reply_request(inbound_command.cid)
+            resp = offchain.reply_request(cid)
             code = 200
         except offchain.Error as e:
             logger.exception(e)
-            resp = offchain.reply_request(inbound_command.cid if inbound_command else None, e.obj)
+            resp = offchain.reply_request(cid if cid else None, e.obj)
             code = 400
 
         return (code, offchain.jws.serialize(resp, self.compliance_key.sign))
 
     def run_once_background_job(
         self,
-    ) -&gt; BgResult:
+    ) -&gt; typing.Optional[BgResult]:
         if len(self.task_queue) == 0:
             return None
         task = self.task_queue[0]
@@ -183,16 +185,17 @@ class WalletApp:
     def start_server(self) -&gt; server.HTTPServer:
         return offchain.http_server.start_local(self.offchain_service_port, self.process_inbound_request)
 
-    def add_child_vasp(self) -&gt; jsonrpc.Transaction:
+    def add_child_vasp(self) -&gt; None:
         self.child_vasps.append(testnet.gen_child_vasp(self.jsonrpc_client, self.parent_vasp))
 
-    def add_user(self, name) -&gt; None:
+    def add_user(self, name: str) -&gt; None:
         self.users[name] = User(name)
 
     def vasp_balance(self, currency: str = testnet.TEST_CURRENCY_CODE) -&gt; int:
         balance = 0
         for vasp in [self.parent_vasp] + self.child_vasps:
-            balance += utils.balance(self.jsonrpc_client.get_account(vasp.account_address), currency)
+            account = self.jsonrpc_client.must_get_account(vasp.account_address)
+            balance += utils.balance(account, currency)
         return balance
 
     def clear_data(self) -&gt; None:
@@ -205,22 +208,24 @@ class WalletApp:
 
     # -------- offchain business actions ---------------
 
-    def _send_additional_kyc_data(
-        self, command: offchain.Command
-    ) -&gt; typing.Tuple[ActionResult, offchain.PaymentCommand]:
+    def _send_additional_kyc_data(self, command: offchain.Command) -&gt; typing.Tuple[ActionResultType, offchain.Command]:
         command = typing.cast(offchain.PaymentCommand, command)
         account_id = command.my_actor_obj().address
         _, subaddress = identifier.decode_account(account_id, self.hrp)
-        user = self._find_user_by_subaddress(subaddress)
+        if subaddress:
+            user = self._find_user_by_subaddress(subaddress)
+        else:
+            raise ValueError(f&#34;{account_id} has no sub-address&#34;)
         new_cmd = command.new_command(additional_kyc_data=user.additional_kyc_data())
         return (ActionResult.SENT_ADDITIONAL_KYC_DATA, new_cmd)
 
     def _submit_travel_rule_txn(
         self,
         command: offchain.Command,
-    ) -&gt; ActionResult:
+    ) -&gt; ActionResultType:
         command = typing.cast(offchain.PaymentCommand, command)
         child_vasp = self._find_child_vasp(command.sender_account_address(self.hrp))
+        assert command.payment.recipient_signature
         testnet.exec_txn(
             self.jsonrpc_client,
             child_vasp,
@@ -235,24 +240,26 @@ class WalletApp:
 
         return ActionResult.TXN_EXECUTED
 
-    def _evaluate_kyc_data(self, command: offchain.Command) -&gt; typing.Tuple[ActionResult, offchain.PaymentCommand]:
+    def _evaluate_kyc_data(self, command: offchain.Command) -&gt; typing.Tuple[ActionResultType, offchain.Command]:
         command = typing.cast(offchain.PaymentCommand, command)
         op_kyc_data = command.opponent_actor_obj().kyc_data
-        ret = self.evaluate_kyc_data_result.get(op_kyc_data.given_name, ActionResult.PASS)
+        assert op_kyc_data is not None
+        ret = self.evaluate_kyc_data_result.get(str(op_kyc_data.given_name), ActionResult.PASS)
 
         if ret == ActionResult.SOFT_MATCH:
             return (ret, command.new_command(status=offchain.Status.soft_match))
         return (ret, self._kyc_data_result(&#34;evaluate key data&#34;, ret, command))
 
-    def _manual_review(self, command: offchain.Command) -&gt; typing.Tuple[ActionResult, offchain.PaymentCommand]:
+    def _manual_review(self, command: offchain.Command) -&gt; typing.Tuple[ActionResultType, offchain.Command]:
         command = typing.cast(offchain.PaymentCommand, command)
         op_kyc_data = command.opponent_actor_obj().kyc_data
-        ret = self.manual_review_result.get(op_kyc_data.given_name, ActionResult.PASS)
+        assert op_kyc_data is not None
+        ret = self.manual_review_result.get(str(op_kyc_data.given_name), ActionResult.PASS)
         return (ret, self._kyc_data_result(&#34;review&#34;, ret, command))
 
     def _kyc_data_result(
-        self, action: str, ret: ActionResult, command: offchain.PaymentCommand
-    ) -&gt; offchain.PaymentCommand:
+        self, action: str, ret: ActionResultType, command: offchain.PaymentCommand
+    ) -&gt; offchain.Command:
         if ret == ActionResult.PASS:
             if command.is_receiver():
                 return self._send_kyc_data_and_receipient_signature(command)
@@ -266,10 +273,13 @@ class WalletApp:
     def _send_kyc_data_and_receipient_signature(
         self,
         command: offchain.PaymentCommand,
-    ) -&gt; offchain.PaymentCommand:
+    ) -&gt; offchain.Command:
         sig_msg = command.travel_rule_metadata_signature_message(self.hrp)
         subaddress = command.receiver_subaddress(self.hrp)
-        user = self._find_user_by_subaddress(subaddress)
+        if subaddress:
+            user = self._find_user_by_subaddress(subaddress)
+        else:
+            raise ValueError(f&#34;could not find receiver subaddress: {command}&#34;)
 
         return command.new_command(
             recipient_signature=self.compliance_key.sign(sig_msg).hex(),
@@ -279,18 +289,20 @@ class WalletApp:
 
     # ---------------------- offchain Command ---------------------------
 
-    def _send_request(self, command: offchain.PaymentCommand) -&gt; ActionResult:
+    def _send_request(self, command: offchain.PaymentCommand) -&gt; ActionResultType:
         self.offchain_client.send_command(command, self.compliance_key.sign)
         self._enqueue_follow_up_action(command)
         return ActionResult.SEND_REQUEST_SUCCESS
 
-    def _enqueue_follow_up_action(self, command: offchain.PaymentCommand) -&gt; None:
+    def _enqueue_follow_up_action(self, command: offchain.Command) -&gt; None:
         if command.follow_up_action():
             self.task_queue.append(lambda app: app._offchain_business_action(command.reference_id()))
 
     def _offchain_business_action(self, ref_id: str) -&gt; BgResult:
-        command = self.saved_commands.get(ref_id)
+        command = self.saved_commands[ref_id]
         action = command.follow_up_action()
+        if not action:
+            raise ValueError(f&#34;no follow up action for the command {command}&#34;)
         if action == offchain.Action.SUBMIT_TXN:
             return (action, self._submit_travel_rule_txn(command))
         actions = {
@@ -369,32 +381,21 @@ class WalletApp:
 <dl>
 <dt id="examples.vasp.wallet.ActionResult"><code class="flex name class">
 <span>class <span class="ident">ActionResult</span></span>
-<span>(</span><span>...)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>str(object='') -&gt; str
-str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</p>
-<p>Create a new string object from the given object. If encoding or
-errors is specified, then the object must expose a data buffer
-that will be decoded using the given encoding and error handler.
-Otherwise, returns the result of object.<strong>str</strong>() (if defined)
-or repr(object).
-encoding defaults to sys.getdefaultencoding().
-errors defaults to 'strict'.</p></div>
+<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class ActionResult(str):
-    def merge(self, ret: str) -&gt; &#34;ActionResult&#34;:
-        if ret == ActionResult.SEND_REQUEST_SUCCESS:
-            return self
-        return self + &#34;, &#34; + ret</code></pre>
+<pre><code class="python">class ActionResult:
+    PASS = ActionResultType(&#34;pass&#34;)
+    REJECT = ActionResultType(&#34;reject&#34;)
+    SOFT_MATCH = ActionResultType(&#34;soft_match&#34;)
+    SENT_ADDITIONAL_KYC_DATA = ActionResultType(&#34;sent_additional_kyc_data&#34;)
+    TXN_EXECUTED = ActionResultType(&#34;transaction_executed&#34;)
+    SEND_REQUEST_SUCCESS = ActionResultType(&#34;send_request_success&#34;)</code></pre>
 </details>
-<h3>Ancestors</h3>
-<ul class="hlist">
-<li>builtins.str</li>
-</ul>
 <h3>Class variables</h3>
 <dl>
 <dt id="examples.vasp.wallet.ActionResult.PASS"><code class="name">var <span class="ident">PASS</span></code></dt>
@@ -422,31 +423,39 @@ errors defaults to 'strict'.</p></div>
 <div class="desc"></div>
 </dd>
 </dl>
-<h3>Methods</h3>
-<dl>
-<dt id="examples.vasp.wallet.ActionResult.merge"><code class="name flex">
-<span>def <span class="ident">merge</span></span>(<span>self, ret: str) ‑> <a title="examples.vasp.wallet.ActionResult" href="#examples.vasp.wallet.ActionResult">ActionResult</a></span>
+</dd>
+<dt id="examples.vasp.wallet.ActionResultType"><code class="flex name class">
+<span>class <span class="ident">ActionResultType</span></span>
+<span>(</span><span>...)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>str(object='') -&gt; str
+str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</p>
+<p>Create a new string object from the given object. If encoding or
+errors is specified, then the object must expose a data buffer
+that will be decoded using the given encoding and error handler.
+Otherwise, returns the result of object.<strong>str</strong>() (if defined)
+or repr(object).
+encoding defaults to sys.getdefaultencoding().
+errors defaults to 'strict'.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def merge(self, ret: str) -&gt; &#34;ActionResult&#34;:
-    if ret == ActionResult.SEND_REQUEST_SUCCESS:
-        return self
-    return self + &#34;, &#34; + ret</code></pre>
+<pre><code class="python">class ActionResultType(str):
+    pass</code></pre>
 </details>
-</dd>
-</dl>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.str</li>
+</ul>
 </dd>
 <dt id="examples.vasp.wallet.User"><code class="flex name class">
 <span>class <span class="ident">User</span></span>
-<span>(</span><span>name: str, subaddresses: List[str] = &lt;factory&gt;)</span>
+<span>(</span><span>name: str, subaddresses: List[bytes] = &lt;factory&gt;)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>User(name: str, subaddresses: List[str] = <factory>)</p></div>
+<div class="desc"><p>User(name: str, subaddresses: List[bytes] = <factory>)</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -454,7 +463,7 @@ errors defaults to 'strict'.</p></div>
 <pre><code class="python">@dataclass(frozen=True)
 class User:
     name: str
-    subaddresses: typing.List[str] = field(default_factory=lambda: [])
+    subaddresses: typing.List[bytes] = field(default_factory=lambda: [])
 
     def kyc_data(self) -&gt; offchain.KycDataObject:
         return offchain.individual_kyc_data(
@@ -472,7 +481,7 @@ class User:
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="examples.vasp.wallet.User.subaddresses"><code class="name">var <span class="ident">subaddresses</span> : List[str]</code></dt>
+<dt id="examples.vasp.wallet.User.subaddresses"><code class="name">var <span class="ident">subaddresses</span> : List[bytes]</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -513,7 +522,7 @@ class User:
 </dd>
 <dt id="examples.vasp.wallet.WalletApp"><code class="flex name class">
 <span>class <span class="ident">WalletApp</span></span>
-<span>(</span><span>name: str, jsonrpc_client: diem.jsonrpc.client.Client, parent_vasp: diem.local_account.LocalAccount, offchain_service_port: int, hrp: str = 'tdm', saved_commands: Dict[str, diem.offchain.command.Command] = &lt;factory&gt;, child_vasps: List[diem.local_account.LocalAccount] = &lt;factory&gt;, users: Dict[str, <a title="examples.vasp.wallet.User" href="#examples.vasp.wallet.User">User</a>] = &lt;factory&gt;, evaluate_kyc_data_result: Dict[str, <a title="examples.vasp.wallet.ActionResult" href="#examples.vasp.wallet.ActionResult">ActionResult</a>] = &lt;factory&gt;, manual_review_result: Dict[str, <a title="examples.vasp.wallet.ActionResult" href="#examples.vasp.wallet.ActionResult">ActionResult</a>] = &lt;factory&gt;, task_queue: List[Callable[[ForwardRef('<a title="examples.vasp.wallet.WalletApp" href="#examples.vasp.wallet.WalletApp">WalletApp</a>')], Union[<a title="examples.vasp.wallet.ActionResult" href="#examples.vasp.wallet.ActionResult">ActionResult</a>, Tuple[diem.offchain.action.Action, <a title="examples.vasp.wallet.ActionResult" href="#examples.vasp.wallet.ActionResult">ActionResult</a>]]]] = &lt;factory&gt;, locks: Dict[str, <built-in function allocate_lock>] = &lt;factory&gt;)</span>
+<span>(</span><span>name: str, jsonrpc_client: diem.jsonrpc.client.Client, parent_vasp: diem.local_account.LocalAccount, offchain_service_port: int, hrp: str = 'tdm', saved_commands: Dict[str, diem.offchain.command.Command] = &lt;factory&gt;, child_vasps: List[diem.local_account.LocalAccount] = &lt;factory&gt;, users: Dict[str, <a title="examples.vasp.wallet.User" href="#examples.vasp.wallet.User">User</a>] = &lt;factory&gt;, evaluate_kyc_data_result: Dict[str, <a title="examples.vasp.wallet.ActionResultType" href="#examples.vasp.wallet.ActionResultType">ActionResultType</a>] = &lt;factory&gt;, manual_review_result: Dict[str, <a title="examples.vasp.wallet.ActionResultType" href="#examples.vasp.wallet.ActionResultType">ActionResultType</a>] = &lt;factory&gt;, task_queue: List[Callable[[ForwardRef('<a title="examples.vasp.wallet.WalletApp" href="#examples.vasp.wallet.WalletApp">WalletApp</a>')], Tuple[Optional[diem.offchain.action.Action], <a title="examples.vasp.wallet.ActionResultType" href="#examples.vasp.wallet.ActionResultType">ActionResultType</a>]]] = &lt;factory&gt;, locks: Dict[str, <built-in function allocate_lock>] = &lt;factory&gt;)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>WalletApp is an example of custodial wallet application</p></div>
@@ -549,10 +558,12 @@ class WalletApp:
     saved_commands: typing.Dict[str, offchain.Command] = field(default_factory=lambda: {})
     child_vasps: typing.List[LocalAccount] = field(default_factory=lambda: [])
     users: typing.Dict[str, User] = field(default_factory=lambda: {})
-    evaluate_kyc_data_result: typing.Dict[str, ActionResult] = field(default_factory=lambda: {})
-    manual_review_result: typing.Dict[str, ActionResult] = field(default_factory=lambda: {})
+    evaluate_kyc_data_result: typing.Dict[str, ActionResultType] = field(default_factory=lambda: {})
+    manual_review_result: typing.Dict[str, ActionResultType] = field(default_factory=lambda: {})
     task_queue: typing.List[typing.Callable[[&#34;WalletApp&#34;], BgResult]] = field(default_factory=lambda: [])
     locks: typing.Dict[str, threading.Lock] = field(default_factory=lambda: {})
+    compliance_key: Ed25519PrivateKey = field(init=False)
+    offchain_client: offchain.Client = field(init=False)
 
     def __post_init__(self) -&gt; None:
         self.compliance_key = self.parent_vasp.compliance_key
@@ -566,7 +577,7 @@ class WalletApp:
         intent_id: str,
         desc: typing.Optional[str] = None,
         original_payment_reference_id: typing.Optional[str] = None,
-    ) -&gt; typing.Tuple[(str, ActionResult)]:
+    ) -&gt; str:
         &#34;&#34;&#34;make payment from given user account to intent_id&#34;&#34;&#34;
 
         intent = identifier.decode_intent(intent_id, self.hrp)
@@ -589,29 +600,30 @@ class WalletApp:
         currency: typing.Optional[str] = testnet.TEST_CURRENCY_CODE,
     ) -&gt; str:
         account_id = self.gen_user_account_id(user_name)
-        return identifier.encode_intent(account_id, currency, amount)
+        return identifier.encode_intent(account_id, str(currency), amount)
 
     # --------------------- offchain integration --------------------------
 
     def process_inbound_request(
         self, x_request_id: str, request_sender_address: str, request_bytes: bytes
     ) -&gt; typing.Tuple[int, bytes]:
-        inbound_command = None
+        cid = None
         try:
             inbound_command = self.offchain_client.process_inbound_request(request_sender_address, request_bytes)
+            cid = inbound_command.id()
             self.save_command(inbound_command)
-            resp = offchain.reply_request(inbound_command.cid)
+            resp = offchain.reply_request(cid)
             code = 200
         except offchain.Error as e:
             logger.exception(e)
-            resp = offchain.reply_request(inbound_command.cid if inbound_command else None, e.obj)
+            resp = offchain.reply_request(cid if cid else None, e.obj)
             code = 400
 
         return (code, offchain.jws.serialize(resp, self.compliance_key.sign))
 
     def run_once_background_job(
         self,
-    ) -&gt; BgResult:
+    ) -&gt; typing.Optional[BgResult]:
         if len(self.task_queue) == 0:
             return None
         task = self.task_queue[0]
@@ -624,16 +636,17 @@ class WalletApp:
     def start_server(self) -&gt; server.HTTPServer:
         return offchain.http_server.start_local(self.offchain_service_port, self.process_inbound_request)
 
-    def add_child_vasp(self) -&gt; jsonrpc.Transaction:
+    def add_child_vasp(self) -&gt; None:
         self.child_vasps.append(testnet.gen_child_vasp(self.jsonrpc_client, self.parent_vasp))
 
-    def add_user(self, name) -&gt; None:
+    def add_user(self, name: str) -&gt; None:
         self.users[name] = User(name)
 
     def vasp_balance(self, currency: str = testnet.TEST_CURRENCY_CODE) -&gt; int:
         balance = 0
         for vasp in [self.parent_vasp] + self.child_vasps:
-            balance += utils.balance(self.jsonrpc_client.get_account(vasp.account_address), currency)
+            account = self.jsonrpc_client.must_get_account(vasp.account_address)
+            balance += utils.balance(account, currency)
         return balance
 
     def clear_data(self) -&gt; None:
@@ -646,22 +659,24 @@ class WalletApp:
 
     # -------- offchain business actions ---------------
 
-    def _send_additional_kyc_data(
-        self, command: offchain.Command
-    ) -&gt; typing.Tuple[ActionResult, offchain.PaymentCommand]:
+    def _send_additional_kyc_data(self, command: offchain.Command) -&gt; typing.Tuple[ActionResultType, offchain.Command]:
         command = typing.cast(offchain.PaymentCommand, command)
         account_id = command.my_actor_obj().address
         _, subaddress = identifier.decode_account(account_id, self.hrp)
-        user = self._find_user_by_subaddress(subaddress)
+        if subaddress:
+            user = self._find_user_by_subaddress(subaddress)
+        else:
+            raise ValueError(f&#34;{account_id} has no sub-address&#34;)
         new_cmd = command.new_command(additional_kyc_data=user.additional_kyc_data())
         return (ActionResult.SENT_ADDITIONAL_KYC_DATA, new_cmd)
 
     def _submit_travel_rule_txn(
         self,
         command: offchain.Command,
-    ) -&gt; ActionResult:
+    ) -&gt; ActionResultType:
         command = typing.cast(offchain.PaymentCommand, command)
         child_vasp = self._find_child_vasp(command.sender_account_address(self.hrp))
+        assert command.payment.recipient_signature
         testnet.exec_txn(
             self.jsonrpc_client,
             child_vasp,
@@ -676,24 +691,26 @@ class WalletApp:
 
         return ActionResult.TXN_EXECUTED
 
-    def _evaluate_kyc_data(self, command: offchain.Command) -&gt; typing.Tuple[ActionResult, offchain.PaymentCommand]:
+    def _evaluate_kyc_data(self, command: offchain.Command) -&gt; typing.Tuple[ActionResultType, offchain.Command]:
         command = typing.cast(offchain.PaymentCommand, command)
         op_kyc_data = command.opponent_actor_obj().kyc_data
-        ret = self.evaluate_kyc_data_result.get(op_kyc_data.given_name, ActionResult.PASS)
+        assert op_kyc_data is not None
+        ret = self.evaluate_kyc_data_result.get(str(op_kyc_data.given_name), ActionResult.PASS)
 
         if ret == ActionResult.SOFT_MATCH:
             return (ret, command.new_command(status=offchain.Status.soft_match))
         return (ret, self._kyc_data_result(&#34;evaluate key data&#34;, ret, command))
 
-    def _manual_review(self, command: offchain.Command) -&gt; typing.Tuple[ActionResult, offchain.PaymentCommand]:
+    def _manual_review(self, command: offchain.Command) -&gt; typing.Tuple[ActionResultType, offchain.Command]:
         command = typing.cast(offchain.PaymentCommand, command)
         op_kyc_data = command.opponent_actor_obj().kyc_data
-        ret = self.manual_review_result.get(op_kyc_data.given_name, ActionResult.PASS)
+        assert op_kyc_data is not None
+        ret = self.manual_review_result.get(str(op_kyc_data.given_name), ActionResult.PASS)
         return (ret, self._kyc_data_result(&#34;review&#34;, ret, command))
 
     def _kyc_data_result(
-        self, action: str, ret: ActionResult, command: offchain.PaymentCommand
-    ) -&gt; offchain.PaymentCommand:
+        self, action: str, ret: ActionResultType, command: offchain.PaymentCommand
+    ) -&gt; offchain.Command:
         if ret == ActionResult.PASS:
             if command.is_receiver():
                 return self._send_kyc_data_and_receipient_signature(command)
@@ -707,10 +724,13 @@ class WalletApp:
     def _send_kyc_data_and_receipient_signature(
         self,
         command: offchain.PaymentCommand,
-    ) -&gt; offchain.PaymentCommand:
+    ) -&gt; offchain.Command:
         sig_msg = command.travel_rule_metadata_signature_message(self.hrp)
         subaddress = command.receiver_subaddress(self.hrp)
-        user = self._find_user_by_subaddress(subaddress)
+        if subaddress:
+            user = self._find_user_by_subaddress(subaddress)
+        else:
+            raise ValueError(f&#34;could not find receiver subaddress: {command}&#34;)
 
         return command.new_command(
             recipient_signature=self.compliance_key.sign(sig_msg).hex(),
@@ -720,18 +740,20 @@ class WalletApp:
 
     # ---------------------- offchain Command ---------------------------
 
-    def _send_request(self, command: offchain.PaymentCommand) -&gt; ActionResult:
+    def _send_request(self, command: offchain.PaymentCommand) -&gt; ActionResultType:
         self.offchain_client.send_command(command, self.compliance_key.sign)
         self._enqueue_follow_up_action(command)
         return ActionResult.SEND_REQUEST_SUCCESS
 
-    def _enqueue_follow_up_action(self, command: offchain.PaymentCommand) -&gt; None:
+    def _enqueue_follow_up_action(self, command: offchain.Command) -&gt; None:
         if command.follow_up_action():
             self.task_queue.append(lambda app: app._offchain_business_action(command.reference_id()))
 
     def _offchain_business_action(self, ref_id: str) -&gt; BgResult:
-        command = self.saved_commands.get(ref_id)
+        command = self.saved_commands[ref_id]
         action = command.follow_up_action()
+        if not action:
+            raise ValueError(f&#34;no follow up action for the command {command}&#34;)
         if action == offchain.Action.SUBMIT_TXN:
             return (action, self._submit_travel_rule_txn(command))
         actions = {
@@ -804,7 +826,11 @@ class WalletApp:
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="examples.vasp.wallet.WalletApp.evaluate_kyc_data_result"><code class="name">var <span class="ident">evaluate_kyc_data_result</span> : Dict[str, <a title="examples.vasp.wallet.ActionResult" href="#examples.vasp.wallet.ActionResult">ActionResult</a>]</code></dt>
+<dt id="examples.vasp.wallet.WalletApp.compliance_key"><code class="name">var <span class="ident">compliance_key</span> : cryptography.hazmat.primitives.asymmetric.ed25519.Ed25519PrivateKey</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="examples.vasp.wallet.WalletApp.evaluate_kyc_data_result"><code class="name">var <span class="ident">evaluate_kyc_data_result</span> : Dict[str, <a title="examples.vasp.wallet.ActionResultType" href="#examples.vasp.wallet.ActionResultType">ActionResultType</a>]</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -820,11 +846,15 @@ class WalletApp:
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="examples.vasp.wallet.WalletApp.manual_review_result"><code class="name">var <span class="ident">manual_review_result</span> : Dict[str, <a title="examples.vasp.wallet.ActionResult" href="#examples.vasp.wallet.ActionResult">ActionResult</a>]</code></dt>
+<dt id="examples.vasp.wallet.WalletApp.manual_review_result"><code class="name">var <span class="ident">manual_review_result</span> : Dict[str, <a title="examples.vasp.wallet.ActionResultType" href="#examples.vasp.wallet.ActionResultType">ActionResultType</a>]</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
 <dt id="examples.vasp.wallet.WalletApp.name"><code class="name">var <span class="ident">name</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="examples.vasp.wallet.WalletApp.offchain_client"><code class="name">var <span class="ident">offchain_client</span> : diem.offchain.client.Client</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -840,7 +870,7 @@ class WalletApp:
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="examples.vasp.wallet.WalletApp.task_queue"><code class="name">var <span class="ident">task_queue</span> : List[Callable[[<a title="examples.vasp.wallet.WalletApp" href="#examples.vasp.wallet.WalletApp">WalletApp</a>], Union[<a title="examples.vasp.wallet.ActionResult" href="#examples.vasp.wallet.ActionResult">ActionResult</a>, Tuple[diem.offchain.action.Action, <a title="examples.vasp.wallet.ActionResult" href="#examples.vasp.wallet.ActionResult">ActionResult</a>]]]]</code></dt>
+<dt id="examples.vasp.wallet.WalletApp.task_queue"><code class="name">var <span class="ident">task_queue</span> : List[Callable[[<a title="examples.vasp.wallet.WalletApp" href="#examples.vasp.wallet.WalletApp">WalletApp</a>], Tuple[Optional[diem.offchain.action.Action], <a title="examples.vasp.wallet.ActionResultType" href="#examples.vasp.wallet.ActionResultType">ActionResultType</a>]]]</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -880,7 +910,7 @@ def generate(name: str, client: jsonrpc.Client) -&gt; &#34;WalletApp&#34;:
 <h3>Methods</h3>
 <dl>
 <dt id="examples.vasp.wallet.WalletApp.add_child_vasp"><code class="name flex">
-<span>def <span class="ident">add_child_vasp</span></span>(<span>self) ‑> jsonrpc_pb2.Transaction</span>
+<span>def <span class="ident">add_child_vasp</span></span>(<span>self) ‑> NoneType</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -888,12 +918,12 @@ def generate(name: str, client: jsonrpc.Client) -&gt; &#34;WalletApp&#34;:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_child_vasp(self) -&gt; jsonrpc.Transaction:
+<pre><code class="python">def add_child_vasp(self) -&gt; None:
     self.child_vasps.append(testnet.gen_child_vasp(self.jsonrpc_client, self.parent_vasp))</code></pre>
 </details>
 </dd>
 <dt id="examples.vasp.wallet.WalletApp.add_user"><code class="name flex">
-<span>def <span class="ident">add_user</span></span>(<span>self, name) ‑> NoneType</span>
+<span>def <span class="ident">add_user</span></span>(<span>self, name: str) ‑> NoneType</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -901,7 +931,7 @@ def generate(name: str, client: jsonrpc.Client) -&gt; &#34;WalletApp&#34;:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def add_user(self, name) -&gt; None:
+<pre><code class="python">def add_user(self, name: str) -&gt; None:
     self.users[name] = User(name)</code></pre>
 </details>
 </dd>
@@ -939,7 +969,7 @@ def generate(name: str, client: jsonrpc.Client) -&gt; &#34;WalletApp&#34;:
     currency: typing.Optional[str] = testnet.TEST_CURRENCY_CODE,
 ) -&gt; str:
     account_id = self.gen_user_account_id(user_name)
-    return identifier.encode_intent(account_id, currency, amount)</code></pre>
+    return identifier.encode_intent(account_id, str(currency), amount)</code></pre>
 </details>
 </dd>
 <dt id="examples.vasp.wallet.WalletApp.gen_user_account_id"><code class="name flex">
@@ -971,7 +1001,7 @@ def generate(name: str, client: jsonrpc.Client) -&gt; &#34;WalletApp&#34;:
 </details>
 </dd>
 <dt id="examples.vasp.wallet.WalletApp.pay"><code class="name flex">
-<span>def <span class="ident">pay</span></span>(<span>self, user_name: str, intent_id: str, desc: Optional[str] = None, original_payment_reference_id: Optional[str] = None) ‑> Tuple[str, <a title="examples.vasp.wallet.ActionResult" href="#examples.vasp.wallet.ActionResult">ActionResult</a>]</span>
+<span>def <span class="ident">pay</span></span>(<span>self, user_name: str, intent_id: str, desc: Optional[str] = None, original_payment_reference_id: Optional[str] = None) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>make payment from given user account to intent_id</p></div>
@@ -985,7 +1015,7 @@ def generate(name: str, client: jsonrpc.Client) -&gt; &#34;WalletApp&#34;:
     intent_id: str,
     desc: typing.Optional[str] = None,
     original_payment_reference_id: typing.Optional[str] = None,
-) -&gt; typing.Tuple[(str, ActionResult)]:
+) -&gt; str:
     &#34;&#34;&#34;make payment from given user account to intent_id&#34;&#34;&#34;
 
     intent = identifier.decode_intent(intent_id, self.hrp)
@@ -1014,22 +1044,23 @@ def generate(name: str, client: jsonrpc.Client) -&gt; &#34;WalletApp&#34;:
 <pre><code class="python">def process_inbound_request(
     self, x_request_id: str, request_sender_address: str, request_bytes: bytes
 ) -&gt; typing.Tuple[int, bytes]:
-    inbound_command = None
+    cid = None
     try:
         inbound_command = self.offchain_client.process_inbound_request(request_sender_address, request_bytes)
+        cid = inbound_command.id()
         self.save_command(inbound_command)
-        resp = offchain.reply_request(inbound_command.cid)
+        resp = offchain.reply_request(cid)
         code = 200
     except offchain.Error as e:
         logger.exception(e)
-        resp = offchain.reply_request(inbound_command.cid if inbound_command else None, e.obj)
+        resp = offchain.reply_request(cid if cid else None, e.obj)
         code = 400
 
     return (code, offchain.jws.serialize(resp, self.compliance_key.sign))</code></pre>
 </details>
 </dd>
 <dt id="examples.vasp.wallet.WalletApp.run_once_background_job"><code class="name flex">
-<span>def <span class="ident">run_once_background_job</span></span>(<span>self) ‑> Union[<a title="examples.vasp.wallet.ActionResult" href="#examples.vasp.wallet.ActionResult">ActionResult</a>, Tuple[diem.offchain.action.Action, <a title="examples.vasp.wallet.ActionResult" href="#examples.vasp.wallet.ActionResult">ActionResult</a>]]</span>
+<span>def <span class="ident">run_once_background_job</span></span>(<span>self) ‑> Optional[Tuple[Optional[diem.offchain.action.Action], <a title="examples.vasp.wallet.ActionResultType" href="#examples.vasp.wallet.ActionResultType">ActionResultType</a>]]</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -1039,7 +1070,7 @@ def generate(name: str, client: jsonrpc.Client) -&gt; &#34;WalletApp&#34;:
 </summary>
 <pre><code class="python">def run_once_background_job(
     self,
-) -&gt; BgResult:
+) -&gt; typing.Optional[BgResult]:
     if len(self.task_queue) == 0:
         return None
     task = self.task_queue[0]
@@ -1110,7 +1141,8 @@ atomic process(read and write) command by the reference id.</p></div>
 <pre><code class="python">def vasp_balance(self, currency: str = testnet.TEST_CURRENCY_CODE) -&gt; int:
     balance = 0
     for vasp in [self.parent_vasp] + self.child_vasps:
-        balance += utils.balance(self.jsonrpc_client.get_account(vasp.account_address), currency)
+        account = self.jsonrpc_client.must_get_account(vasp.account_address)
+        balance += utils.balance(account, currency)
     return balance</code></pre>
 </details>
 </dd>
@@ -1141,8 +1173,10 @@ atomic process(read and write) command by the reference id.</p></div>
 <li><code><a title="examples.vasp.wallet.ActionResult.SENT_ADDITIONAL_KYC_DATA" href="#examples.vasp.wallet.ActionResult.SENT_ADDITIONAL_KYC_DATA">SENT_ADDITIONAL_KYC_DATA</a></code></li>
 <li><code><a title="examples.vasp.wallet.ActionResult.SOFT_MATCH" href="#examples.vasp.wallet.ActionResult.SOFT_MATCH">SOFT_MATCH</a></code></li>
 <li><code><a title="examples.vasp.wallet.ActionResult.TXN_EXECUTED" href="#examples.vasp.wallet.ActionResult.TXN_EXECUTED">TXN_EXECUTED</a></code></li>
-<li><code><a title="examples.vasp.wallet.ActionResult.merge" href="#examples.vasp.wallet.ActionResult.merge">merge</a></code></li>
 </ul>
+</li>
+<li>
+<h4><code><a title="examples.vasp.wallet.ActionResultType" href="#examples.vasp.wallet.ActionResultType">ActionResultType</a></code></h4>
 </li>
 <li>
 <h4><code><a title="examples.vasp.wallet.User" href="#examples.vasp.wallet.User">User</a></code></h4>
@@ -1160,6 +1194,7 @@ atomic process(read and write) command by the reference id.</p></div>
 <li><code><a title="examples.vasp.wallet.WalletApp.add_user" href="#examples.vasp.wallet.WalletApp.add_user">add_user</a></code></li>
 <li><code><a title="examples.vasp.wallet.WalletApp.child_vasps" href="#examples.vasp.wallet.WalletApp.child_vasps">child_vasps</a></code></li>
 <li><code><a title="examples.vasp.wallet.WalletApp.clear_data" href="#examples.vasp.wallet.WalletApp.clear_data">clear_data</a></code></li>
+<li><code><a title="examples.vasp.wallet.WalletApp.compliance_key" href="#examples.vasp.wallet.WalletApp.compliance_key">compliance_key</a></code></li>
 <li><code><a title="examples.vasp.wallet.WalletApp.evaluate_kyc_data_result" href="#examples.vasp.wallet.WalletApp.evaluate_kyc_data_result">evaluate_kyc_data_result</a></code></li>
 <li><code><a title="examples.vasp.wallet.WalletApp.gen_intent_id" href="#examples.vasp.wallet.WalletApp.gen_intent_id">gen_intent_id</a></code></li>
 <li><code><a title="examples.vasp.wallet.WalletApp.gen_user_account_id" href="#examples.vasp.wallet.WalletApp.gen_user_account_id">gen_user_account_id</a></code></li>
@@ -1170,6 +1205,7 @@ atomic process(read and write) command by the reference id.</p></div>
 <li><code><a title="examples.vasp.wallet.WalletApp.locks" href="#examples.vasp.wallet.WalletApp.locks">locks</a></code></li>
 <li><code><a title="examples.vasp.wallet.WalletApp.manual_review_result" href="#examples.vasp.wallet.WalletApp.manual_review_result">manual_review_result</a></code></li>
 <li><code><a title="examples.vasp.wallet.WalletApp.name" href="#examples.vasp.wallet.WalletApp.name">name</a></code></li>
+<li><code><a title="examples.vasp.wallet.WalletApp.offchain_client" href="#examples.vasp.wallet.WalletApp.offchain_client">offchain_client</a></code></li>
 <li><code><a title="examples.vasp.wallet.WalletApp.offchain_service_port" href="#examples.vasp.wallet.WalletApp.offchain_service_port">offchain_service_port</a></code></li>
 <li><code><a title="examples.vasp.wallet.WalletApp.parent_vasp" href="#examples.vasp.wallet.WalletApp.parent_vasp">parent_vasp</a></code></li>
 <li><code><a title="examples.vasp.wallet.WalletApp.pay" href="#examples.vasp.wallet.WalletApp.pay">pay</a></code></li>
